@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 public class CustomPlayerRenderer extends GeoReplacedEntityRenderer<Player, CustomPlayerEntity, PlayerRenderState> {
 
     private ResourceLocation currentTexture;
+    private Player currentPlayer;
 
     public CustomPlayerRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -45,6 +46,7 @@ public class CustomPlayerRenderer extends GeoReplacedEntityRenderer<Player, Cust
         if (SWarfareCompat.isPlayerAiming(player) || (capability = PlayerCapability.get(player).orElse(null)) == null) {
             return;
         }
+        this.currentPlayer = player;
         capability.tickModel();
         SpecialPlayerRenderEvent renderEvent = new SpecialPlayerRenderEvent(player, capability, capability.getModelId());
         this.currentTexture = renderEvent.getTextureLocation();
@@ -97,7 +99,20 @@ public class CustomPlayerRenderer extends GeoReplacedEntityRenderer<Player, Cust
 
     @Override
     public net.minecraft.resources.ResourceLocation getTextureLocation(net.minecraft.client.renderer.entity.state.PlayerRenderState state) {
-        return this.currentTexture == null ? net.minecraft.client.renderer.texture.MissingTextureAtlasSprite.getLocation() : this.currentTexture;
+        if (this.currentTexture != null) {
+            return this.currentTexture;
+        }
+
+        Player player = this.currentPlayer;
+        if (player == null) {
+            player = Minecraft.getInstance().player;
+        }
+        if (player != null) {
+            return PlayerCapability.get(player)
+                    .map(PlayerCapability::getTextureLocation)
+                    .orElse(MissingTextureAtlasSprite.getLocation());
+        }
+        return MissingTextureAtlasSprite.getLocation();
     }
 
     // TODO: port to 1.21.4

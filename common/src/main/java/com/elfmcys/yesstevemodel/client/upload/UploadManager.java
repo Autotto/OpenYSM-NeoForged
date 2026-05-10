@@ -3,6 +3,7 @@ package com.elfmcys.yesstevemodel.client.upload;
 import com.elfmcys.yesstevemodel.ResourceCleanupHelper;
 import com.elfmcys.yesstevemodel.YesSteveModel;
 import com.elfmcys.yesstevemodel.client.texture.ITextureMap;
+import com.elfmcys.yesstevemodel.client.texture.OuterFileTexture;
 import com.google.common.collect.Queues;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.Pair;
@@ -115,6 +116,11 @@ public class UploadManager {
     private static void registerTexture(AbstractTexture texture, TextureLocatable locatable) {
         if (!locatable.registered) {
             Minecraft.getInstance().getTextureManager().register(locatable.resourceLocation, texture);
+
+            if (texture instanceof OuterFileTexture oft) {
+                oft.load();
+            }
+
             ResourceCleanupHelper.registerBiCleanup(locatable, locatable.resourceLocation, locatable.resolution, (resourceLocation, num) -> {
                 expiredTextures.put(texture, ReferenceIntMutablePair.of(resourceLocation, num));
             });

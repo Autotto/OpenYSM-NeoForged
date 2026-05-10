@@ -23,8 +23,7 @@ public class OuterFileTexture extends AbstractTexture implements ITextureMap {
         this.data = data;
     }
 
-    // TODO 1.21.4 port: AbstractTexture.load(ResourceManager) was renamed/removed; @Override removed to allow compile.
-    public void load(@NotNull ResourceManager resourceManager) {
+    public void load() {
         if (!RenderSystem.isOnRenderThreadOrInit()) {
             RenderSystem.recordRenderCall(this::doLoad);
         } else {
