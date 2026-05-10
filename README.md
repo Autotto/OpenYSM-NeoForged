@@ -1,14 +1,14 @@
 <div align="center">
   <img src="images/brand.png" alt="logo" width="300"/>
-  <h1>OpenYSM</h1>
-  <p>YSM开源替代品，基于2.6.5 fabric</p>
+  <h1>OpenYSM-Updated</h1>
+  <p>OpenYSM 的 fabric 高版本移植</p>
 </div>
 
 ## 说明
 
 本仓库包含了 YesSteveModel (YSM) 2.6.5（2026年4月）版本的完整源代码。
 
-仅支持 1.20.1 Fabric 平台。
+仅支持 1.21.4 Fabric 平台。
 
 **请注意：项目并非 Production Ready，可能存在命名语义错误，渲染错误等问题，如果您在使用过程中遇到了任何问题请打开 Issue 反馈，最好附带截图和可能的报错日志。**
 
