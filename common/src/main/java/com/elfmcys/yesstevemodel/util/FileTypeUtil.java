@@ -79,7 +79,7 @@ public final class FileTypeUtil {
                 ResourceLocation resourceLocation = ResourceLocation.tryParse(str.substring(1));
                 if (resourceLocation != null) {
                     TagKey<EntityType<?>> tagKey = TagKey.create(Registries.ENTITY_TYPE, resourceLocation);
-                    BuiltInRegistries.ENTITY_TYPE.getTag(tagKey).ifPresent(holderSet ->
+                    BuiltInRegistries.ENTITY_TYPE.get(tagKey).ifPresent(holderSet ->
                         holderSet.forEach(holder -> holder.unwrapKey().ifPresent(rk -> hashSet.add(rk.location())))
                     );
                 }

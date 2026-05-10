@@ -1,5 +1,6 @@
 package com.elfmcys.yesstevemodel.client.renderer.layer;
 
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import rip.ysm.compat.slashblade.SlashBladeRenderer;
 import rip.ysm.compat.slashblade.SlashBladeCompat;
 import rip.ysm.compat.gun.swarfare.SWarfareCompat;
@@ -27,7 +28,7 @@ public class CustomPlayerItemInHandLayer extends GeoLayerRenderer<CustomPlayerEn
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, int packedLightIn, CustomPlayerEntity entityLivingBaseIn, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void render(PlayerRenderState state, PoseStack poseStack, MultiBufferSource bufferSource, int packedLightIn, CustomPlayerEntity entityLivingBaseIn, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
         LivingEntity entity = entityLivingBaseIn.getEntity();
         AnimatedGeoModel animatedGeoModel = entityLivingBaseIn.getCurrentModel();
         if (animatedGeoModel == null) {

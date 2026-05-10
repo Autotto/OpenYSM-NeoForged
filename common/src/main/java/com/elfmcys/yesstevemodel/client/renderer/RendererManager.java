@@ -1,6 +1,7 @@
 package com.elfmcys.yesstevemodel.client.renderer;
 
 import com.elfmcys.yesstevemodel.YesSteveModel;
+import com.elfmcys.yesstevemodel.mixin.client.EntityRenderDispatcherAccessor;
 import dev.architectury.registry.ReloadListenerRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -45,7 +46,16 @@ public class RendererManager {
             return;
         }
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-        EntityRendererProvider.Context context = new EntityRendererProvider.Context(entityRenderDispatcher, Minecraft.getInstance().getItemRenderer(), Minecraft.getInstance().getBlockRenderer(), entityRenderDispatcher.getItemInHandRenderer(), resourceManager, Minecraft.getInstance().getEntityModels(), Minecraft.getInstance().font);
+        EntityRendererProvider.Context context = new EntityRendererProvider.Context(
+                entityRenderDispatcher,
+                Minecraft.getInstance().getItemModelResolver(),
+                Minecraft.getInstance().getMapRenderer(),
+                Minecraft.getInstance().getBlockRenderer(),
+                resourceManager,
+                Minecraft.getInstance().getEntityModels(),
+                ((EntityRenderDispatcherAccessor) Minecraft.getInstance().getEntityRenderDispatcher()).getEquipmentAssetManager(),
+                Minecraft.getInstance().font
+        );
         playerRenderer = new CustomPlayerRenderer(context);
         projectileRenderer = new ProjectileRenderer(context);
         handRenderer = new HandItemRenderer();

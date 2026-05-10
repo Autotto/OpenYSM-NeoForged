@@ -9,6 +9,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.world.entity.player.Player;
 import rip.ysm.compat.firstperson.FirstPersonCompat;
 import rip.ysm.compat.playeranimator.PlayerAnimatorCompat;
@@ -19,7 +21,7 @@ public class ReplacePlayerRenderEvent {
     private ReplacePlayerRenderEvent() {
     }
 
-    public static boolean onRenderPlayerPre(Player entity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public static boolean onRenderPlayerPre(Player entity, PlayerRenderState renderState, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         if (!YesSteveModel.isAvailable()) {
             return false;
         }
@@ -39,7 +41,7 @@ public class ReplacePlayerRenderEvent {
                         || GeneralConfig.DISABLE_EXTERNAL_FP_ANIM.get().booleanValue()
                         || !PlayerAnimatorCompat.isPlayerAnimated(localPlayer)) {
                     cancelled[0] = true;
-                    RendererManager.getPlayerRenderer().render(entity, entity.getYRot(), partialTick, poseStack, bufferSource, packedLight);
+                    RendererManager.getPlayerRenderer().render(entity, renderState, entity.getYRot(), partialTick, poseStack, bufferSource, packedLight);
                 }
             }
         });

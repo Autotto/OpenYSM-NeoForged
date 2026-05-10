@@ -9,7 +9,7 @@ import dev.architectury.event.EventResult;
 import dev.architectury.event.events.client.ClientRawInputEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.Input;
+import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import rip.ysm.api.PlatformAPI;
 
@@ -45,8 +45,8 @@ public class AnimationLockEvent {
     }
 
     public static boolean isPlayerMoving(LocalPlayer localPlayer) {
-        Input input = localPlayer.input;
-        return input != null && (isSignificantImpulse(input.leftImpulse) || isSignificantImpulse(input.forwardImpulse) || input.jumping || input.shiftKeyDown);
+        ClientInput input = localPlayer.input;
+        return input != null && (isSignificantImpulse(input.leftImpulse) || isSignificantImpulse(input.forwardImpulse) || input.keyPresses.jump() || input.keyPresses.shift());
     }
 
     private static boolean isSignificantImpulse(float impulse) {

@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import dev.architectury.utils.GameInstance;
 import org.jetbrains.annotations.Nullable;
 import rip.ysm.api.PlatformAPI;
@@ -26,7 +27,7 @@ public class YSMMessageFormatter {
         if (entity == null) {
             return false;
         }
-        return entity.hasPermissions(level) || isCurrentClientPlayer(entity);
+        return (entity instanceof Player p && p.hasPermissions(level)) || isCurrentClientPlayer(entity);
     }
 
     public static boolean hasCommandPermission(CommandSourceStack commandSourceStack, int level) {

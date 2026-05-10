@@ -30,9 +30,9 @@ public class ModIconButton extends FlatColorButton {
             PlayerCapability.get(localPlayer).ifPresent(cap -> {
                 StarModelsCapability.get(localPlayer).ifPresent(cap2 -> {
                     if (cap2.containsModel(cap.getModelId())) {
-                        guiGraphics.blit(ICON_TEXTURE, getX() + iconOffsetX, getY() + iconOffsetY, 16, 16, 16.0f, 0.0f, 16, 16, 256, 256);
+                        guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, ICON_TEXTURE, getX() + iconOffsetX, getY() + iconOffsetY, 16.0f, 0.0f, 16, 16, 256, 256);
                     } else {
-                        guiGraphics.blit(ICON_TEXTURE, getX() + iconOffsetX, getY() + iconOffsetY, 16, 16, 0.0f, 0.0f, 16, 16, 256, 256);
+                        guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, ICON_TEXTURE, getX() + iconOffsetX, getY() + iconOffsetY, 0.0f, 0.0f, 16, 16, 256, 256);
                     }
                 });
             });

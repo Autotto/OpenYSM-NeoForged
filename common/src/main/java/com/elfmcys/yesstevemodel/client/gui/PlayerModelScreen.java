@@ -446,7 +446,7 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         guiGraphics.fillGradient(this.guiLeft + 138, this.guiTop, this.guiLeft + 420, this.guiTop + 235, -14540254, -14540254);
         guiGraphics.fillGradient(this.guiLeft + 351, this.guiTop + 7, this.guiLeft + 352, this.guiTop + 21, -790560, -790560);
         this.searchBox.render(guiGraphics, mouseX, mouseY, partialTick);
-        renderModelPreview(guiGraphics, mouseX, mouseY, this.minecraft.getTimer().getGameTimeDeltaPartialTick(false));
+        renderModelPreview(guiGraphics, mouseX, mouseY, this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false));
         if (this.searchBox.getValue().isEmpty() && !this.searchBox.isFocused()) {
             guiGraphics.drawString(this.font, Component.translatable("gui.yes_steve_model.search").withStyle(ChatFormatting.ITALIC), this.guiLeft + 148, this.guiTop + 10, 7829367);
         }
@@ -672,11 +672,6 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
             return true;
         }
         return true;
-    }
-
-    @Override
-    protected void renderBlurredBackground(float f) {
-
     }
 
     public int getCurrentPage() {

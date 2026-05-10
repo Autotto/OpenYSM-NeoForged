@@ -16,32 +16,32 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin({AbstractArrow.class})
-public class AbstractArrowEntityMixin implements ProjectileStateAccessor {
+public abstract class AbstractArrowEntityMixin implements ProjectileStateAccessor {
 
     @Unique
     private String ownerMainHandItem = StringPool.EMPTY;
 
     @Shadow
-    public boolean inGround;
+    protected int inGroundTime;
 
     @Shadow
-    public int inGroundTime;
+    protected abstract boolean isInGround();
 
     @Override
     @Unique
-    public boolean isInGround() {
-        return this.inGround;
+    public boolean ysm$isArrowInGround() {
+        return this.isInGround();
     }
 
     @Override
     @Unique
-    public int getInGroundTime() {
+    public int ysm$getInGroundTime() {
         return this.inGroundTime;
     }
 
     @Override
     @Unique
-    public String getOwnerItemId() {
+    public String ysm$getOwnerItemId() {
         return this.ownerMainHandItem;
     }
 

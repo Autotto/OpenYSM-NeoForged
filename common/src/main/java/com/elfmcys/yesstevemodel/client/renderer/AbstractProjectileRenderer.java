@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import com.mojang.math.Axis;
 
-public abstract class AbstractProjectileRenderer<TEntity extends Projectile, T extends AnimatableEntity<TEntity>> extends EntityRenderer<TEntity> implements IGeoRenderer<T> {
+public abstract class AbstractProjectileRenderer<TEntity extends Projectile, T extends AnimatableEntity<TEntity>, S extends EntityRenderState> extends EntityRenderer<TEntity, S> implements IGeoRenderer<T> {
 
     public Matrix4f modelViewMatrix;
 
@@ -40,7 +41,7 @@ public abstract class AbstractProjectileRenderer<TEntity extends Projectile, T e
         this.bufferSource = null;
     }
 
-    public void render(T animatable, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void render(T animatable, S state, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         AnimationEvent<?> event = animatable.processAnimation(partialTick);
         Minecraft minecraft = Minecraft.getInstance();
         if (event != null && minecraft.player != null) {
@@ -60,7 +61,18 @@ public abstract class AbstractProjectileRenderer<TEntity extends Projectile, T e
                 poseStack.popPose();
             }
         }
-        super.render(animatable.getEntity(), entityYaw, partialTick, poseStack, bufferSource, packedLight);
+         super.render(state, poseStack, bufferSource, packedLight);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public S createRenderState() {
+        return (S) new EntityRenderState();
+    }
+
+    @Override
+    public void extractRenderState(TEntity entity, S state, float partialTick) {
+        super.extractRenderState(entity, state, partialTick);
     }
 
     @Override

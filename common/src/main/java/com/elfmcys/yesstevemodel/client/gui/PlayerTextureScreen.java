@@ -6,6 +6,7 @@ import com.elfmcys.yesstevemodel.client.gui.button.IconButton;
 import com.elfmcys.yesstevemodel.client.gui.button.TextureButton;
 import com.elfmcys.yesstevemodel.client.entity.PlayerPreviewEntity;
 import com.elfmcys.yesstevemodel.client.model.ModelAssembly;
+import com.elfmcys.yesstevemodel.client.renderer.CustomPlayerRenderer;
 import com.elfmcys.yesstevemodel.client.renderer.ModelPreviewRenderer;
 import com.elfmcys.yesstevemodel.client.renderer.RendererManager;
 import com.elfmcys.yesstevemodel.geckolib3.core.molang.util.StringPool;
@@ -18,6 +19,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -221,7 +226,7 @@ public class PlayerTextureScreen extends Screen {
         if (!this.modelHolder.getAnimationStateMachine().isCurrentAnimation(this.currentAnimation)) {
             this.modelHolder.getAnimationStateMachine().setCurrentAnimation(this.currentAnimation);
         }
-        renderTexturePreview(guiGraphics, scissorX, height, scissorWidth, scissorHeight, this.minecraft.getTimer().getGameTimeDeltaPartialTick(false));
+        renderTexturePreview(guiGraphics, scissorX, height, scissorWidth, scissorHeight, this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false));
         String str = String.format("%d/%d", this.textureCurrentPage + 1, this.textureMaxPage + 1);
         Font font = this.font;
         int iWidth = this.guiLeft + 302 + ((118 - this.font.width(str)) / 2);
@@ -242,7 +247,10 @@ public class PlayerTextureScreen extends Screen {
         RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
         PlayerCapability.get(this.minecraft.player).ifPresent(cap -> {
             this.modelHolder.initModelWithTexture(this.modelId, cap.getCurrentTextureName());
-            ModelPreviewRenderer.renderEntityPreview(this.guiLeft + 149.5f + 40.0f + this.offsetX, this.guiTop + 117.5f + 80.0f + this.offsetY, this.zoom, this.pitch, this.yaw, partialTick, this.modelHolder, RendererManager.getPlayerRenderer(), this.showGround);
+            CustomPlayerRenderer playerRenderer = RendererManager.getPlayerRenderer();
+            PlayerRenderState state = new PlayerRenderState();
+            playerRenderer.extractRenderState(this.modelHolder.entity, state, partialTick);
+            ModelPreviewRenderer.renderEntityPreview(this.guiLeft + 149.5f + 40.0f + this.offsetX, this.guiTop + 117.5f + 80.0f + this.offsetY, this.zoom, this.pitch, this.yaw, partialTick, this.modelHolder, state, playerRenderer, this.showGround);
         });
         RenderSystem.disableScissor();
     }
@@ -337,11 +345,6 @@ public class PlayerTextureScreen extends Screen {
 
     private void adjustZoom(float zoomDelta) {
         this.zoom = Mth.clamp(this.zoom + (zoomDelta * this.zoom), MIN_ZOOM, MAX_ZOOM);
-    }
-
-    @Override
-    protected void renderBlurredBackground(float f) {
-
     }
 
     public boolean isPauseScreen() {

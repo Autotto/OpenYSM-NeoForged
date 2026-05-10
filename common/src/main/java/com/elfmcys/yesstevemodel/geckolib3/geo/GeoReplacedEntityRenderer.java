@@ -20,12 +20,14 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import rip.ysm.api.client.RenderLivingBridge;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +39,7 @@ import org.joml.Vector3f;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class GeoReplacedEntityRenderer<TEntity extends LivingEntity, T extends LivingAnimatable<TEntity>> extends LivingEntityRenderer<TEntity, PlayerModel<TEntity>> implements IGeoRenderer<T> {
+public abstract class GeoReplacedEntityRenderer<TEntity extends Player, T extends LivingAnimatable<TEntity>, S extends PlayerRenderState> extends LivingEntityRenderer<TEntity, S, PlayerModel> implements IGeoRenderer<T> {
 
     public final List<GeoLayerRenderer<T>> layerRenderers = new ObjectArrayList<>();
 
@@ -75,11 +77,11 @@ public abstract class GeoReplacedEntityRenderer<TEntity extends LivingEntity, T 
         IGeoRenderer.super.renderEarly(animatable, poseStack, partialTick, bufferSource, buffer, packedLight, packedOverlayIn, red, green, blue, alpha);
     }
 
-    public void renderEntity(T t, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        renderEntityWithTexture(t, null, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+    public void renderEntity(T t, S state, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        renderEntityWithTexture(t, state, null, entityYaw, partialTick, poseStack, bufferSource, packedLight);
     }
 
-    public void renderEntityWithTexture(T t, @Nullable ResourceLocation resourceLocation, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
+    public void renderEntityWithTexture(T t, S state, @Nullable ResourceLocation resourceLocation, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
         Direction bedOrientation;
         if (RenderLivingBridge.firePre(t.getEntity(), this, partialTick, poseStack, multiBufferSource, packedLight)) {
             return;
@@ -96,7 +98,7 @@ public abstract class GeoReplacedEntityRenderer<TEntity extends LivingEntity, T 
                 float eyeHeight = entity.getEyeHeight(Pose.STANDING) - 0.1f;
                 poseStack.translate((-bedOrientation.getStepX()) * eyeHeight, 0.0f, (-bedOrientation.getStepZ()) * eyeHeight);
             }
-            setupRotations(entity, poseStack, modelData.lerpedAge, modelData.lerpBodyRot, partialTick, 1.0f);
+            setupRotations(entity, state, poseStack, modelData.lerpedAge, modelData.lerpBodyRot, partialTick, 1.0f);
             if (t.getEntity().getVehicle() != null) {
                 VehicleCapability.get(t.getEntity().getVehicle()).ifPresent(cap -> {
                     Vector3f vector3f = cap.getExpressionOffset();
@@ -109,28 +111,28 @@ public abstract class GeoReplacedEntityRenderer<TEntity extends LivingEntity, T 
             poseStack.translate(0.0f, 0.01f, 0.0f);
             AnimatedGeoModel animatedGeoModel = t.getCurrentModel();
             int textureIndex = resourceLocation == null ? t.getTextureIndex() : 0;
-            RenderType renderType = getRenderType(resourceLocation == null ? t.getTextureLocation() : resourceLocation, isBodyVisible(entity) && !entity.isInvisibleTo(minecraft.player), minecraft.shouldEntityAppearGlowing(entity), t.getCurrentModel().getGeoModel().isTranslucentTexture(textureIndex));
+            RenderType renderType = getRenderType(resourceLocation == null ? t.getTextureLocation() : resourceLocation, isBodyVisible(state) && !entity.isInvisibleTo(minecraft.player), minecraft.shouldEntityAppearGlowing(entity), t.getCurrentModel().getGeoModel().isTranslucentTexture(textureIndex));
             boolean useExtraPlayer = t.isRenderLayersFirst();
             Color color = getRenderColor(t, partialTick, poseStack, multiBufferSource, null, packedLight);
             renderWithBone(animatedGeoModel, t, partialTick, poseStack, multiBufferSource, null, packedLight, packOverlayCoords(entity, getHurtOverlayProgress(entity, partialTick)), color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, color.getAlpha() / 255.0f);
             if (useExtraPlayer && !entity.isSpectator()) {
-                render(t, partialTick, poseStack, multiBufferSource, packedLight, event, modelData);
+                render(t, state, partialTick, poseStack, multiBufferSource, packedLight, event, modelData);
             }
             if (renderType != null) {
                 renderWithBoneAndRenderType(animatedGeoModel, t, partialTick, renderType, poseStack, multiBufferSource, textureIndex, null, packedLight, packOverlayCoords(entity, getHurtOverlayProgress(entity, partialTick)), color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, color.getAlpha() / 255.0f);
             }
             if (!useExtraPlayer && !entity.isSpectator()) {
-                render(t, partialTick, poseStack, multiBufferSource, packedLight, event, modelData);
+                render(t, state, partialTick, poseStack, multiBufferSource, packedLight, event, modelData);
             }
             poseStack.popPose();
         }
-        ((LivingEntityRendererAccessor) this).tlm$renderNameTag(entity, entityYaw, partialTick, poseStack, multiBufferSource, packedLight);
+        ((LivingEntityRendererAccessor) this).tlm$renderNameTag(state, poseStack, multiBufferSource, packedLight);
         RenderLivingBridge.firePost(entity, this, partialTick, poseStack, multiBufferSource, packedLight);
     }
 
-    public void render(T entity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLightIn, AnimationEvent<?> event, EntityModelData data) {
+    public void render(T entity, S state, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLightIn, AnimationEvent<?> event, EntityModelData data) {
         for (GeoLayerRenderer<T> layerRenderer : this.layerRenderers) {
-            layerRenderer.render(poseStack, bufferSource, packedLightIn, entity, event.getLimbSwing(), event.getLimbSwingAmount(), partialTick, data.lerpedAge, data.rawNetHeadYaw, data.rawHeadPitch);
+            layerRenderer.render(state, poseStack, bufferSource, packedLightIn, entity, event.getLimbSwing(), event.getLimbSwingAmount(), partialTick, data.lerpedAge, data.rawNetHeadYaw, data.rawHeadPitch);
         }
     }
 
@@ -141,7 +143,7 @@ public abstract class GeoReplacedEntityRenderer<TEntity extends LivingEntity, T 
     public void preRenderCallback(TEntity entity, PoseStack poseStack, float partialTick) {
     }
 
-    public void setupRotations(TEntity tentity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks, float scale) {
+    public void setupRotations(TEntity tentity, S state, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks, float scale) {
         int t = tentity.deathTime;
         boolean zIsAutoSpinAttack = tentity.isAutoSpinAttack();
         if (t > 0) {
@@ -159,7 +161,7 @@ public abstract class GeoReplacedEntityRenderer<TEntity extends LivingEntity, T 
                 }
             }
         }
-        super.setupRotations(tentity, poseStack, ageInTicks, rotationYaw, partialTicks, scale);
+        super.setupRotations(state, poseStack, partialTicks, scale);
         if (t > 0) {
             tentity.deathTime = t;
         }
@@ -169,9 +171,9 @@ public abstract class GeoReplacedEntityRenderer<TEntity extends LivingEntity, T 
     }
 
     @Override
-    public boolean shouldShowName(TEntity entity) {
+    public boolean shouldShowName(TEntity entity, double distance) {
         double d = entity.isDiscrete() ? 32.0d : 64.0d;
-        return this.entityRenderDispatcher.distanceToSqr(entity) < d * d && entity == this.entityRenderDispatcher.crosshairPickEntity && entity.hasCustomName() && Minecraft.renderNames();
+        return distance < d * d && entity == this.entityRenderDispatcher.crosshairPickEntity && entity.hasCustomName() && Minecraft.renderNames();
     }
 
     public final boolean addLayerRenderer(GeoLayerRenderer<T> layerRenderer) {
@@ -186,5 +188,10 @@ public abstract class GeoReplacedEntityRenderer<TEntity extends LivingEntity, T 
     @Override
     public void setCurrentRTB(MultiBufferSource bufferSource) {
         this.rtb = bufferSource;
+    }
+
+    @Override
+    public void extractRenderState(TEntity entity, S state, float partialTick) {
+        super.extractRenderState(entity, state, partialTick);
     }
 }

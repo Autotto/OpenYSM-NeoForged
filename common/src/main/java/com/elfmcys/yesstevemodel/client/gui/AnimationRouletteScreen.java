@@ -529,7 +529,7 @@ public class AnimationRouletteScreen extends Screen {
             });
         }
         if (localPlayer != null && GeneralConfig.PRINT_ANIMATION_ROULETTE_MSG.get().booleanValue()) {
-            localPlayer.sendSystemMessage(Component.translatable("message.yes_steve_model.model.animation_roulette.play", str));
+            localPlayer.displayClientMessage(Component.translatable("message.yes_steve_model.model.animation_roulette.play", str), false);
         }
         Minecraft.getInstance().setScreen(null);
     }
@@ -538,7 +538,7 @@ public class AnimationRouletteScreen extends Screen {
         if (navigationStack.size() > 5) {
             LocalPlayer localPlayer = Minecraft.getInstance().player;
             if (localPlayer != null) {
-                localPlayer.sendSystemMessage(Component.translatable("gui.yes_steve_model.roulette.too_long"));
+                localPlayer.displayClientMessage(Component.translatable("gui.yes_steve_model.roulette.too_long"), false);
                 return;
             }
             return;
@@ -637,7 +637,6 @@ public class AnimationRouletteScreen extends Screen {
         }
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         Matrix4f matrix4fPose = poseStack.last().pose();
@@ -705,8 +704,4 @@ public class AnimationRouletteScreen extends Screen {
         bufferBuilder.addVertex(matrix4f, this.centerX + (outerRadius * Mth.cos(endAngle)), this.centerY + (outerRadius * Mth.sin(endAngle)), 0.0f).setColor(red, green, blue, alpha);
     }
 
-    @Override
-    protected void renderBlurredBackground(float f) {
-
-    }
 }

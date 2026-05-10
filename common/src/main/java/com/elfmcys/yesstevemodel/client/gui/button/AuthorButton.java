@@ -67,7 +67,7 @@ public class AuthorButton extends Button {
         } else {
             guiGraphics.fillGradient(getX(), getY(), getX() + this.width, getY() + this.height, -1891417534, -1891417534);
         }
-        guiGraphics.blit(this.resourceLocation, getX() + 3, getY() + 3, 64, 64, 0.0f, 0.0f, 64, 64, 64, 64);
+        guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, this.resourceLocation, getX() + 3, getY() + 3, 0.0f, 0.0f, 64, 64, 64, 64);
         String str = ModelMetadataPresenter.getLocalizedModelString(this.modelAssembly, "metadata.authors.%d.name".formatted(this.authorIndex), this.authorInfo.getName());
         String str2 = ModelMetadataPresenter.getLocalizedModelString(this.modelAssembly, "metadata.authors.%d.role".formatted(this.authorIndex), this.authorInfo.getRole());
         String str3 = ModelMetadataPresenter.getLocalizedModelString(this.modelAssembly, "metadata.authors.%d.comment".formatted(this.authorIndex), this.authorInfo.getComment());

@@ -84,7 +84,7 @@ public class YesSteveModel {
     public static void sendUnavailableMessage() {
         LocalPlayer localPlayer = Minecraft.getInstance().player;
         if (localPlayer != null) {
-            localPlayer.sendSystemMessage(getUnavailableComponent());
+            localPlayer.displayClientMessage(getUnavailableComponent(), false);
         }
     }
 

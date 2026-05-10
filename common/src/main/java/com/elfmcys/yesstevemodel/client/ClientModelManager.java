@@ -765,7 +765,7 @@ public class ClientModelManager {
             });
             if (obj instanceof Component component) {
                 if (Minecraft.getInstance().player != null) {
-                    Minecraft.getInstance().player.sendSystemMessage(component);
+                    Minecraft.getInstance().player.displayClientMessage(component, false);
                 }
                 YesSteveModel.LOGGER.error(component.getString(256));
             }

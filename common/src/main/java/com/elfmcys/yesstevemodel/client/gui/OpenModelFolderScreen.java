@@ -36,8 +36,4 @@ public class OpenModelFolderScreen extends Screen {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
-    @Override
-    protected void renderBlurredBackground(float f) {
-
-    }
 }

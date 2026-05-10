@@ -34,7 +34,7 @@ public class ConfigCheckBox extends StateSwitchingButton implements ISpecialWidg
 
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         int v = this.isStateTriggered ? 12 : 0;
-        guiGraphics.blit(TEXTURE, getX(), getY(), 0, v, this.width, this.height, 128, 24);
+        guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, TEXTURE, getX(), getY(), 0, v, this.width, this.height, 128, 24);
         guiGraphics.drawString(Minecraft.getInstance().font, this.component2, getX() + 14, getY() + 2, -1, false);
     }
 

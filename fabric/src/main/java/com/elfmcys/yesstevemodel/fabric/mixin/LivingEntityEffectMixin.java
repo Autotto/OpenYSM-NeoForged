@@ -11,6 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.world.entity.Entity;
 
+import java.util.Collection;
+
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityEffectMixin {
 
@@ -20,9 +22,11 @@ public abstract class LivingEntityEffectMixin {
         MobEffectEvent.onEffectAdded(self, instance.getEffect(), instance.getAmplifier());
     }
 
-    @Inject(method = "onEffectRemoved", at = @At("HEAD"))
-    private void ysm$onEffectRemoved(MobEffectInstance instance, CallbackInfo ci) {
+    @Inject(method = "onEffectsRemoved", at = @At("HEAD"))
+    private void ysm$onEffectsRemoved(Collection<MobEffectInstance> collection, CallbackInfo ci) {
         LivingEntity self = (LivingEntity) (Object) this;
-        MobEffectEvent.onEffectRemoved(self, instance.getEffect());
+        for (MobEffectInstance mobEffectInstance : collection) {
+            MobEffectEvent.onEffectRemoved(self, mobEffectInstance.getEffect());
+        }
     }
 }

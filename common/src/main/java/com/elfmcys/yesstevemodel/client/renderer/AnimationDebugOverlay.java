@@ -95,7 +95,7 @@ public class AnimationDebugOverlay {
             MutableComponent mutableComponentAppend = Component.translatable("message.yes_steve_model.model.debug_animation.true").append(" -> ");
             Component customName = entity.getCustomName();
             Objects.requireNonNull(entity);
-            localPlayer.sendSystemMessage(mutableComponentAppend.append(Objects.requireNonNullElseGet(customName, entity::getDisplayName)));
+            localPlayer.displayClientMessage(mutableComponentAppend.append(Objects.requireNonNullElseGet(customName, entity::getDisplayName)), false);
         }
     }
 
@@ -108,7 +108,7 @@ public class AnimationDebugOverlay {
             activeModel = null;
             LocalPlayer localPlayer = Minecraft.getInstance().player;
             if (localPlayer != null) {
-                localPlayer.sendSystemMessage(Component.translatable("message.yes_steve_model.model.debug_animation.false"));
+                localPlayer.displayClientMessage(Component.translatable("message.yes_steve_model.model.debug_animation.false"), false);
             }
         }
     }

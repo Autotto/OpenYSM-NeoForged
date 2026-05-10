@@ -15,8 +15,8 @@ public class AnimationUtils {
         return seconds * 20;
     }
 
-    public static <T extends Entity> EntityRenderer<T> getRenderer(T entity) {
+    public static <T extends Entity> EntityRenderer<T, ?> getRenderer(T entity) {
         EntityRenderDispatcher renderManager = Minecraft.getInstance().getEntityRenderDispatcher();
-        return (EntityRenderer<T>) renderManager.getRenderer(entity);
+        return (EntityRenderer<T, ?>) renderManager.getRenderer(entity);
     }
 }

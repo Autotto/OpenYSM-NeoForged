@@ -3,6 +3,7 @@ package com.elfmcys.yesstevemodel.client.gui.button;
 import com.elfmcys.yesstevemodel.YesSteveModel;
 import com.elfmcys.yesstevemodel.capability.PlayerCapability;
 import com.elfmcys.yesstevemodel.capability.StarModelsCapability;
+import com.elfmcys.yesstevemodel.client.renderer.CustomPlayerRenderer;
 import com.elfmcys.yesstevemodel.resource.models.Metadata;
 import com.elfmcys.yesstevemodel.client.animation.AnimationTracker;
 import com.elfmcys.yesstevemodel.client.entity.PlayerPreviewEntity;
@@ -27,6 +28,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -171,18 +173,21 @@ public class ModelButton extends Button {
         if (this.backgroundTexture != null) {
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
-            guiGraphics.blit(this.backgroundTexture.getResourceLocation().get(), x, y, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
+            guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, this.backgroundTexture.getResourceLocation().get(), x, y, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
             RenderSystem.disableBlend();
         }
         double guiScale = Minecraft.getInstance().getWindow().getGuiScale();
         RenderSystem.enableScissor((int) (x * guiScale), (int) (Minecraft.getInstance().getWindow().getHeight() - (((y + this.height) - 20) * guiScale)), (int) (this.width * guiScale), (int) ((this.height - 20) * guiScale));
-        ModelPreviewRenderer.renderLivingEntityPreview(x + (this.width / 2.0f), y + (this.height / 2.0f) + 20.0f, 30.0f, minecraft.getTimer().getGameTimeDeltaPartialTick(false), this.modelIdHolder, RendererManager.getPlayerRenderer(), this.disablePreviewRotation, true);
+        CustomPlayerRenderer playerRenderer = RendererManager.getPlayerRenderer();
+        PlayerRenderState state = new PlayerRenderState();
+        playerRenderer.extractRenderState(this.modelIdHolder.entity, state, partialTick);
+        ModelPreviewRenderer.renderLivingEntityPreview(x + (this.width / 2.0f), y + (this.height / 2.0f) + 20.0f, 30.0f, minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false), this.modelIdHolder, state, playerRenderer, this.disablePreviewRotation, true);
         RenderSystem.disableScissor();
         int starZ = 3500;
         if (this.foregroundTexture != null) {
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
-            guiGraphics.blit(this.foregroundTexture.getResourceLocation().get(), x, y, 3500, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
+            guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, this.foregroundTexture.getResourceLocation().get(), x, y, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
             RenderSystem.disableBlend();
         }
         List listSplit = font.split(getMessage(), 45);
@@ -204,7 +209,7 @@ public class ModelButton extends Button {
         if (minecraft.player != null) {
             StarModelsCapability.get(minecraft.player).ifPresent(cap -> {
                 if (cap.containsModel(this.modelIdHolder.getModelId())) {
-                    guiGraphics.blit(ICON_TEXTURE, (x + this.width) - 14, y, starZ, 16.0f, 0.0f, 16, 16, 256, 256);
+                    guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, ICON_TEXTURE, (x + this.width) - 14, y, 16.0f, 0.0f, 16, 16, 256, 256);
                 }
             });
         }
@@ -236,6 +241,6 @@ public class ModelButton extends Button {
     }
 
     public boolean clicked(double mouseX, double mouseY) {
-        return !this.isStarred && super.clicked(mouseX, mouseY);
+        return !this.isStarred && this.active && this.visible && this.isMouseOver(mouseX, mouseY);
     }
 }

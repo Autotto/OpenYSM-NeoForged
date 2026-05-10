@@ -3,6 +3,7 @@ package com.elfmcys.yesstevemodel.client.renderer;
 import com.elfmcys.yesstevemodel.capability.VehicleCapability;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -11,10 +12,10 @@ import net.minecraft.world.phys.Vec3;
 import rip.ysm.api.entity.EntityDataBridge;
 
 public class CustomVehicleRenderer {
-    public static boolean renderVehicle(Entity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public static boolean renderVehicle(Entity entity, EntityRenderState state, float yaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         return VehicleCapability.get(entity).map(cap -> {
             if (cap.isModelInitialized() && cap.isModelReady()) {
-                RendererManager.getVehicleRenderer().renderEntity(cap, getBodyRotation(entity, entityYaw, partialTick), partialTick, poseStack, bufferSource, packedLight);
+                RendererManager.getVehicleRenderer().renderEntity(cap, state, getBodyRotation(entity, yaw, partialTick), partialTick, poseStack, bufferSource, packedLight);
                 return false;
             }
             return true;
@@ -54,13 +55,15 @@ public class CustomVehicleRenderer {
         double interpX = Mth.lerp(partialTick, minecart.xOld, minecart.getX());
         double interpY = Mth.lerp(partialTick, minecart.yOld, minecart.getY());
         double interpZ = Mth.lerp(partialTick, minecart.zOld, minecart.getZ());
-        Vec3 interpPos = minecart.getPos(interpX, interpY, interpZ);
+        // TODO 1.21.4 port: AbstractMinecart.getPos/getPosOffs were removed; using raw position as placeholder
+        Vec3 interpPos = new net.minecraft.world.phys.Vec3(interpX, interpY, interpZ);
 
         float calculatedYaw = defaultYaw;
 
         if (interpPos != null) {
-            Vec3 frontOffsetPos = minecart.getPosOffs(interpX, interpY, interpZ, 0.30000001192092896d);
-            Vec3 backOffsetPos = minecart.getPosOffs(interpX, interpY, interpZ, -0.30000001192092896d);
+            // TODO 1.21.4 port: AbstractMinecart.getPos/getPosOffs were removed; using raw position as placeholder
+            Vec3 frontOffsetPos = new net.minecraft.world.phys.Vec3(interpX, interpY, interpZ);
+            Vec3 backOffsetPos = new net.minecraft.world.phys.Vec3(interpX, interpY, interpZ);
 
             if (frontOffsetPos == null) {
                 frontOffsetPos = interpPos;

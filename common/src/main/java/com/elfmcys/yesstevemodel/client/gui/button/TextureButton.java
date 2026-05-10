@@ -4,6 +4,7 @@ import com.elfmcys.yesstevemodel.capability.PlayerCapability;
 import com.elfmcys.yesstevemodel.client.entity.PlayerPreviewEntity;
 import com.elfmcys.yesstevemodel.client.model.ModelAssembly;
 import com.elfmcys.yesstevemodel.client.gui.ModelMetadataPresenter;
+import com.elfmcys.yesstevemodel.client.renderer.CustomPlayerRenderer;
 import com.elfmcys.yesstevemodel.client.renderer.ModelPreviewRenderer;
 import com.elfmcys.yesstevemodel.client.renderer.RendererManager;
 import com.elfmcys.yesstevemodel.network.NetworkHandler;
@@ -14,6 +15,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
@@ -47,7 +49,7 @@ public class TextureButton extends Button {
         Minecraft minecraft = Minecraft.getInstance();
         Font font = minecraft.font;
         guiGraphics.fillGradient(getX(), getY(), getX() + this.width, getY() + this.height, -12369342, -12369342);
-        renderPlayerPreview(guiGraphics, minecraft.getTimer().getGameTimeDeltaPartialTick(false));
+        renderPlayerPreview(guiGraphics, minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false));
         String str = this.previewEntity.getCurrentTextureName();
         MutableComponent mutableComponentLiteral = Component.literal(ModelMetadataPresenter.getLocalizedModelString(this.modelAssembly, "files.player.texture.%s".formatted(str), str));
         List listSplit = font.split(mutableComponentLiteral, 50);
@@ -68,7 +70,10 @@ public class TextureButton extends Button {
     public void renderPlayerPreview(GuiGraphics guiGraphics, float partialTick) {
         double guiScale = Minecraft.getInstance().getWindow().getGuiScale();
         RenderSystem.enableScissor((int) (getX() * guiScale), (int) (Minecraft.getInstance().getWindow().getHeight() - (((getY() + this.height) - 20) * guiScale)), (int) (this.width * guiScale), (int) ((this.height - 20) * guiScale));
-        ModelPreviewRenderer.renderLivingEntityPreview(getX() + (this.width / 2.0f), getY() + (this.height / 2.0f) + 24.0f, 35.0f, partialTick, this.previewEntity, RendererManager.getPlayerRenderer(), false, true);
+        CustomPlayerRenderer playerRenderer = RendererManager.getPlayerRenderer();
+        PlayerRenderState state = new PlayerRenderState();
+        playerRenderer.extractRenderState(this.previewEntity.entity, state, partialTick);
+        ModelPreviewRenderer.renderLivingEntityPreview(getX() + (this.width / 2.0f), getY() + (this.height / 2.0f) + 24.0f, 35.0f, partialTick, this.previewEntity, state, playerRenderer, false, true);
         RenderSystem.disableScissor();
     }
 }

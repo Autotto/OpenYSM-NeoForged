@@ -6,23 +6,24 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.projectile.Projectile;
 import org.jetbrains.annotations.NotNull;
 
-public class ProjectileRenderer extends AbstractProjectileRenderer<Projectile, GeckoProjectileEntity> {
+public class ProjectileRenderer extends AbstractProjectileRenderer<Projectile, GeckoProjectileEntity, EntityRenderState> {
     public ProjectileRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
 
-    public void render(Projectile projectile, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void render(Projectile projectile, EntityRenderState state, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         if (Minecraft.getInstance().player == null || projectile.isInvisibleTo(Minecraft.getInstance().player)) {
             return;
         }
         ProjectileCapability.get(projectile).ifPresent(cap -> {
             cap.tickModel();
-            render(cap, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+            render(cap, state, partialTick, poseStack, bufferSource, packedLight);
         });
     }
 

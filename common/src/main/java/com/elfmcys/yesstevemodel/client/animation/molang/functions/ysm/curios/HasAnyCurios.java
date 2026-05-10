@@ -6,6 +6,7 @@ import com.elfmcys.yesstevemodel.geckolib3.core.molang.funciton.entity.LivingEnt
 import com.elfmcys.yesstevemodel.molang.runtime.ExecutionContext;
 import com.elfmcys.yesstevemodel.util.ThreadLocalItemTagSets;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,7 +27,7 @@ public class HasAnyCurios extends LivingEntityFunction {
             if (name == null) {
                 return null;
             }
-            Item item = BuiltInRegistries.ITEM.get(name);
+            Item item = BuiltInRegistries.ITEM.get(name).map(Holder::value).orElse(null);
             if (item != null) {
                 referenceOpenHashSet.add(item);
             }

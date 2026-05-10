@@ -8,13 +8,23 @@
     "defaultRequire": 1
   },
   "client": [
-    "client.BufferSourceMixin", "client.EntityRenderDispatcherMixin",
-    "client.FishingHookAccessor", "client.InventoryScreenMixin", "client.LivingEntityAccessor",
-    "client.LivingRendererMixin", "client.PauseScreenMixin", "client.ScreenAccessor",
-    "client.ThrowableItemProjectileAccessor", "client.WorldRendererMixin"
+    "client.BufferSourceMixin",
+    "client.EntityRenderDispatcherAccessor",
+    "client.EntityRenderDispatcherMixin",
+    "client.FishingHookAccessor",
+    "client.InventoryScreenMixin",
+    "client.LivingEntityAccessor",
+    "client.LivingRendererMixin",
+    "client.PauseScreenMixin",
+    "client.ScreenAccessor",
+    "client.ThrowableItemProjectileAccessor",
+    "client.WorldRendererMixin"
   ],
   "mixins": [
-    "AbstractArrowEntityMixin", "ConnectionAccessor", "ProjectileEntityMixin",
-    "ServerCommonPacketListenerImplMixin", "ServerPlayerMixin"
+    "AbstractArrowEntityMixin",
+    "ConnectionAccessor",
+    "ProjectileEntityMixin",
+    "ServerCommonPacketListenerImplMixin",
+    "ServerPlayerMixin"
   ]
 }

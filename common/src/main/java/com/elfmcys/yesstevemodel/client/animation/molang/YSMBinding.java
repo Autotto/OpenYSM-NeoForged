@@ -190,10 +190,10 @@ public class YSMBinding extends ContextBinding {
         throwableProjectileEntityVar("throwable_item", YSMBinding::getThrowableItemId);
         fishHookEntityVar("hooked_in", YSMBinding::getHookedEntityType);
         fishHookEntityVar("is_biting", ctx -> ((FishingHookAccessor) ctx.entity()).isBiting());
-        abstractArrowEntityVar("on_ground_time", ctx -> ((ProjectileStateAccessor) ctx.entity()).getInGroundTime());
-        abstractArrowEntityVar("in_ground", ctx -> ((ProjectileStateAccessor) ctx.entity()).isInGround());
+        abstractArrowEntityVar("on_ground_time", ctx -> ((ProjectileStateAccessor) ctx.entity()).ysm$getInGroundTime());
+        abstractArrowEntityVar("in_ground", ctx -> ((ProjectileStateAccessor) ctx.entity()).ysm$isArrowInGround());
         abstractArrowEntityVar("is_spectral_arrow", ctx -> ctx.entity() instanceof SpectralArrow);
-        abstractArrowEntityVar("shoot_item_id", ctx -> ((ProjectileStateAccessor) ctx.entity()).getOwnerItemId());
+        abstractArrowEntityVar("shoot_item_id", ctx -> ((ProjectileStateAccessor) ctx.entity()).ysm$getOwnerItemId());
         CuriosCompat.registerCuriosItems(this);
     }
 

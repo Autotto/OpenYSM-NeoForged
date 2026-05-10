@@ -23,7 +23,7 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
@@ -67,7 +67,7 @@ public class QueryBinding extends ContextBinding {
         entityVar("eye_target_x_rotation", ctx -> ctx.entity().getViewXRot(ctx.animationEvent().getFrameTime()));
         entityVar("eye_target_y_rotation", ctx -> ctx.entity().getViewYRot(ctx.animationEvent().getFrameTime()));
         entityVar("ground_speed", ctx -> getGroundSpeed(ctx.entity()));
-        entityVar("modified_distance_moved", ctx -> ctx.entity().walkDist);
+        entityVar("modified_distance_moved", ctx -> ctx.entity().moveDist);
         entityVar("vertical_speed", QueryBinding::getVerticalSpeed);
         entityVar("walk_distance", ctx -> ctx.entity().moveDist);
         entityVar("has_rider", ctx -> ctx.entity().isVehicle());
@@ -87,7 +87,7 @@ public class QueryBinding extends ContextBinding {
         livingEntityVar("health", QueryBinding::getHealth);
         livingEntityVar("max_health", QueryBinding::getMaxHealth);
         livingEntityVar("hurt_time", ctx -> ctx.entity().hurtTime);
-        livingEntityVar("is_eating", ctx -> ctx.entity().getUseItem().getUseAnimation() == UseAnim.EAT);
+        livingEntityVar("is_eating", ctx -> ctx.entity().getUseItem().getUseAnimation() == ItemUseAnimation.EAT);
         livingEntityVar("is_playing_dead", ctx -> ctx.entity().isDeadOrDying());
         livingEntityVar("is_sleeping", ctx -> ctx.entity().isSleeping());
         livingEntityVar("is_using_item", ctx -> ctx.entity().isUsingItem());
@@ -193,6 +193,7 @@ public class QueryBinding extends ContextBinding {
     private static float getCapeFlapAmount(IContext<Player> context) {
         float gameTime = context.animationEvent().getFrameTime();
         Player player = context.entity();
+        AbstractClientPlayer ap = (AbstractClientPlayer) player;
         float fLerp = (float) (Mth.lerp(gameTime, player.xCloakO, player.xCloak) - Mth.lerp(gameTime, player.xo, player.getX()));
         float fLerp2 = (float) (Mth.lerp(gameTime, player.yCloakO, player.yCloak) - Mth.lerp(gameTime, player.yo, player.getY()));
         float fLerp3 = (float) (Mth.lerp(gameTime, player.zCloakO, player.zCloak) - Mth.lerp(gameTime, player.zo, player.getZ()));
@@ -204,7 +205,7 @@ public class QueryBinding extends ContextBinding {
         if (fClamp2 < 0.0f) {
             fClamp2 = 0.0f;
         }
-        float fSin2 = fClamp + (Mth.sin(Mth.lerp(gameTime, player.walkDistO, player.walkDist) * 6.0f) * 32.0f * Mth.lerp(gameTime, player.oBob, player.bob));
+        float fSin2 = fClamp + (Mth.sin(Mth.lerp(gameTime, ap.walkDistO, ap.walkDist) * 6.0f) * 32.0f * Mth.lerp(gameTime, ap.oBob, ap.bob));
         if (player.isCrouching()) {
             fSin2 += 25.0f;
         }

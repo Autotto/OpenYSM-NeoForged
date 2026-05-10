@@ -30,7 +30,8 @@ public class EffectLevel extends ContextFunction<Entity> {
             ResourceLocation effectId = arguments.getResourceLocation(context, i);
             if (effectId != null) {
                 Holder<MobEffect> mobEffectHolder = BuiltInRegistries.MOB_EFFECT
-                        .getHolder(ResourceKey.create(net.minecraft.core.registries.Registries.MOB_EFFECT, effectId))
+                        .get(ResourceKey.create(net.minecraft.core.registries.Registries.MOB_EFFECT, effectId))
+                        .map(h -> (Holder<MobEffect>) h)
                         .orElse(null);
                 if (mobEffectHolder != null) {
                     if (context.entity().geoInstance() instanceof PlayerCapability cap

@@ -93,7 +93,7 @@ public class ExtraPlayerRenderScreen extends Screen {
         }
         guiGraphics.pose().popPose();
         if (Minecraft.getInstance().player != null && !ExtraPlayerRenderConfig.DISABLE_PLAYER_RENDER.get().booleanValue()) {
-            ModelPreviewRenderer.renderPlayerOverlay(guiGraphics, Minecraft.getInstance().player, this.mouseStartX, this.mouseStartY, this.rotationX, this.rotationY, -500, this.minecraft.getTimer().getGameTimeDeltaPartialTick(false));
+            ModelPreviewRenderer.renderPlayerOverlay(guiGraphics, Minecraft.getInstance().player, this.mouseStartX, this.mouseStartY, this.rotationX, this.rotationY, -500, this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false));
         }
         super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
@@ -159,8 +159,4 @@ public class ExtraPlayerRenderScreen extends Screen {
         super.onClose();
     }
 
-    @Override
-    protected void renderBlurredBackground(float f) {
-
-    }
 }

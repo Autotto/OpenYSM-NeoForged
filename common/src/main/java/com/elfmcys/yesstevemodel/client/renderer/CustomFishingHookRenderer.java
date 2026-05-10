@@ -1,6 +1,7 @@
 package com.elfmcys.yesstevemodel.client.renderer;
 
 import com.elfmcys.yesstevemodel.capability.ProjectileCapability;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import rip.ysm.compat.oculus.OculusCompat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -18,12 +19,12 @@ import rip.ysm.api.item.ToolActionBridge;
 import org.spongepowered.asm.mixin.Unique;
 
 public class CustomFishingHookRenderer {
-    public static boolean tryRenderCustomHook(FishingHook fishingHook, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public static boolean tryRenderCustomHook(FishingHook fishingHook, EntityRenderState state, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         return ProjectileCapability.get(fishingHook).map(cap -> {
             if (cap.isModelInitialized() && cap.isModelReady()) {
                 fishingHook.setXRot(0.0f);
                 fishingHook.xRotO = 0.0f;
-                RendererManager.getProjectileRenderer().render(cap, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+                RendererManager.getProjectileRenderer().render(cap.getEntity(), state, partialTick, poseStack, bufferSource, packedLight);
                 Player playerOwner = fishingHook.getPlayerOwner();
                 if (playerOwner != null) {
                     poseStack.pushPose();

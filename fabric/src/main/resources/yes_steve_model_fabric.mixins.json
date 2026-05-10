@@ -7,8 +7,8 @@
     "defaultRequire": 1
   },
   "client": [
-    "client.PlayerRendererHandMixin",
-    "client.PlayerRendererMixin",
+    "client.ItemInHandRendererMixin",
+    "client.EntityRenderDispatcherMixin",
     "client.YSMSoundInstanceFabricMixin"
   ],
   "mixins": [

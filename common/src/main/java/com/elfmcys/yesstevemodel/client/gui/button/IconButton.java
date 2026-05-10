@@ -23,6 +23,6 @@ public class IconButton extends FlatColorButton {
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.blit(ICON_TEXTURE, getX() + ((this.width - 16) / 2), getY() + ((this.height - 16) / 2), 16, 16, this.iconU, this.iconV, 16, 16, 256, 256);
+        guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, ICON_TEXTURE, getX() + ((this.width - 16) / 2), getY() + ((this.height - 16) / 2), this.iconU, this.iconV, 16, 16, 256, 256);
     }
 }

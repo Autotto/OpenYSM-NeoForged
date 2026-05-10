@@ -36,13 +36,14 @@ public class PackIconButton extends Button {
         Font font = minecraft.font;
         guiGraphics.fillGradient(getX(), getY(), getX() + this.width, getY() + this.height, -6598176, -6598176);
         ResourceLocation location = FileTypeUtil.getPackIconLocation(this.packData.getPath());
-        AbstractTexture texture = minecraft.getTextureManager().getTexture(location, MissingTextureAtlasSprite.getTexture());
+        AbstractTexture texture = minecraft.getTextureManager().getTexture(location);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        if (texture == MissingTextureAtlasSprite.getTexture()) {
-            guiGraphics.blit(default_pack_icon, getX(), getY(), 0.0f, 0.0f, this.width, this.height, this.width, this.height);
+        boolean missing = texture == null || location.equals(MissingTextureAtlasSprite.getLocation());
+        if (missing) {
+            guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, default_pack_icon, getX(), getY(), 0.0f, 0.0f, this.width, this.height, this.width, this.height);
         } else {
-            guiGraphics.blit(location, getX(), getY(), 0.0f, 0.0f, this.width, this.height, this.width, this.height);
+            guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, location, getX(), getY(), 0.0f, 0.0f, this.width, this.height, this.width, this.height);
         }
         RenderSystem.disableBlend();
         List listSplit = font.split(getMessage(), 45);

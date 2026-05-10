@@ -1,6 +1,10 @@
 package com.elfmcys.yesstevemodel.client.renderer.layer;
 
 import com.elfmcys.yesstevemodel.client.entity.CustomPlayerEntity;
+import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import rip.ysm.compat.cosmeticarmorreworked.CosmeticArmorHelper;
 import com.elfmcys.yesstevemodel.geckolib3.geo.GeoLayerRenderer;
 import com.elfmcys.yesstevemodel.geckolib3.geo.animated.AnimatedGeoModel;
@@ -24,14 +28,14 @@ public class CustomPlayerElytraLayer extends GeoLayerRenderer<CustomPlayerEntity
 
     private static final ResourceLocation WINGS_LOCATION = ResourceLocation.parse("textures/entity/elytra.png");
 
-    private final ElytraModel<LivingEntity> elytraModel;
+    private final ElytraModel elytraModel;
 
     public CustomPlayerElytraLayer(EntityRendererProvider.Context context) {
-        this.elytraModel = new ElytraModel<>(context.getModelSet().bakeLayer(ModelLayers.ELYTRA));
+        this.elytraModel = new ElytraModel(context.getModelSet().bakeLayer(ModelLayers.ELYTRA));
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource bufferSource, int packedLightIn, CustomPlayerEntity entityLivingBaseIn, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void render(PlayerRenderState state, PoseStack poseStack, MultiBufferSource bufferSource, int packedLightIn, CustomPlayerEntity entityLivingBaseIn, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
         ResourceLocation cloakTextureLocation;
         LivingEntity entity = entityLivingBaseIn.getEntity();
         ItemStack stack = CosmeticArmorHelper.getElytraItem(entity);
@@ -50,7 +54,7 @@ public class CustomPlayerElytraLayer extends GeoLayerRenderer<CustomPlayerEntity
             poseStack.translate(0.0d, 1.5d, 0.0d);
             poseStack.mulPose(Axis.ZP.rotationDegrees(180.0f));
             poseStack.scale(2.0f, 2.0f, 2.0f);
-            this.elytraModel.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+            this.elytraModel.setupAnim(state);
             this.elytraModel.renderToBuffer(poseStack, ItemRenderer.getArmorFoilBuffer(bufferSource, RenderType.armorCutoutNoCull(cloakTextureLocation), stack.hasFoil()), packedLightIn, OverlayTexture.NO_OVERLAY, -1);
             poseStack.popPose();
         }

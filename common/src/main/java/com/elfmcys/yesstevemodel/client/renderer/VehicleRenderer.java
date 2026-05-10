@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -17,13 +18,13 @@ public class VehicleRenderer extends GeoEntityRenderer<Entity, GeckoVehicleEntit
         super(context);
     }
 
-    public void render(Entity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void render(Entity entity, EntityRenderState state, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         if (Minecraft.getInstance().player == null || entity.isInvisibleTo(Minecraft.getInstance().player)) {
             return;
         }
         VehicleCapability.get(entity).ifPresent(cap -> {
             cap.tickModel();
-            renderEntity(cap, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+            renderEntity(cap, state, entityYaw, partialTick, poseStack, bufferSource, packedLight);
         });
     }
 
