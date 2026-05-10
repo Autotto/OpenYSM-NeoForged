@@ -493,7 +493,7 @@ public class ClientModelManager {
     }
 
     public static SyncStatus getSyncStatus() {
-        RenderSystem.assertOnGameThread();
+        RenderSystem.assertOnRenderThreadOrInit();
         return syncState;
     }
 

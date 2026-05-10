@@ -61,7 +61,7 @@ public final class YesModelUtils {
 
     public static Map<String, byte[]> input(File ysmFile) throws IOException {
         String fileName = removeExtension(ysmFile.getName());
-        if (!ResourceLocation.isValidResourceLocation(fileName)) {
+        if (!(ResourceLocation.tryParse(fileName) != null)) {
             return Collections.emptyMap();
         }
         byte[] data = FileUtils.readFileToByteArray(ysmFile);

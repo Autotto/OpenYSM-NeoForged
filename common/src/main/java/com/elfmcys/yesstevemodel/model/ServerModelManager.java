@@ -2,6 +2,7 @@ package com.elfmcys.yesstevemodel.model;
 
 import com.elfmcys.yesstevemodel.capability.ModelInfoCapability;
 import com.elfmcys.yesstevemodel.client.ExportResult;
+import com.elfmcys.yesstevemodel.access.ServerCommonPacketListenerImplAccess;
 import com.elfmcys.yesstevemodel.model.format.*;
 import com.elfmcys.yesstevemodel.resource.YSMBinaryDeserializer;
 import com.elfmcys.yesstevemodel.resource.YSMBinarySerializer;
@@ -37,7 +38,6 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import dev.architectury.platform.Platform;
 import dev.architectury.utils.GameInstance;
 import com.elfmcys.yesstevemodel.mixin.ConnectionAccessor;
-import com.elfmcys.yesstevemodel.mixin.ServerCommonPacketListenerImplAccessor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
@@ -964,7 +964,7 @@ public final class ServerModelManager {
         if (!serverGamePacketListenerImpl.isAcceptingMessages() || !serverGamePacketListenerImpl.getClass().equals(ServerGamePacketListenerImpl.class)) {
             return null;
         }
-        return ((ServerCommonPacketListenerImplAccessor) serverGamePacketListenerImpl).ysm$getConnection();
+        return ((ServerCommonPacketListenerImplAccess) serverGamePacketListenerImpl).ysm$getConnection();
     }
 
     private static boolean sendModelData(UUID uuid, ByteBuffer byteBuffer, PendingTransfer pendingTransfer) {

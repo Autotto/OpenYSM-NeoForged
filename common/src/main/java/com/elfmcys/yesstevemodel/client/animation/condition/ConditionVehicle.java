@@ -32,13 +32,13 @@ public class ConditionVehicle {
             return;
         }
         String strSubstring = name.substring(preSize);
-        if (name.startsWith(this.idPre) && ResourceLocation.isValidResourceLocation(strSubstring)) {
-            this.idTest.add(new ResourceLocation(strSubstring));
+        if (name.startsWith(this.idPre) && (ResourceLocation.tryParse(strSubstring) != null)) {
+            this.idTest.add(ResourceLocation.parse(strSubstring));
         }
-        if (!name.startsWith(this.tagPre) || !ResourceLocation.isValidResourceLocation(strSubstring)) {
+        if (!name.startsWith(this.tagPre) || !(ResourceLocation.tryParse(strSubstring) != null)) {
             return;
         }
-        this.tagTest.add(TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation(strSubstring)));
+        this.tagTest.add(TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.parse(strSubstring)));
     }
 
     public String doTest(LivingEntity entity) {

@@ -31,6 +31,8 @@ dependencies {
     modImplementation fabricApi.module("fabric-lifecycle-events-v1", rootProject.fabric_api_version)
 
     modImplementation "maven.modrinth:forge-config-api-port:$rootProject.forge_config_api_port_version"
+    implementation "com.electronwill.night-config:core:3.8.0"
+    implementation "com.electronwill.night-config:toml:3.8.0"
 
     modImplementation("dev.architectury:architectury-fabric:$rootProject.architectury_api_version") {
         exclude group: "net.fabricmc.fabric-api", module: "fabric-api"
@@ -40,10 +42,10 @@ dependencies {
     include "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
     include "maven.modrinth:forge-config-api-port:$rootProject.forge_config_api_port_version"
 
-    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.3"
-    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.3"
-    include "dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.3"
-    include "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.3"
+    modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-base:$rootProject.cardinal_components_version"
+    modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-entity:$rootProject.cardinal_components_version"
+    include "org.ladysnake.cardinal-components-api:cardinal-components-base:$rootProject.cardinal_components_version"
+    include "org.ladysnake.cardinal-components-api:cardinal-components-entity:$rootProject.cardinal_components_version"
 
     implementation "com.github.OpenYSM:ImageStream:-SNAPSHOT"
     include "com.github.OpenYSM:ImageStream:-SNAPSHOT"

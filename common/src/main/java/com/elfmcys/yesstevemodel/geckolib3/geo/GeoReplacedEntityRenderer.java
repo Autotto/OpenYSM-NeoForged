@@ -96,7 +96,7 @@ public abstract class GeoReplacedEntityRenderer<TEntity extends LivingEntity, T 
                 float eyeHeight = entity.getEyeHeight(Pose.STANDING) - 0.1f;
                 poseStack.translate((-bedOrientation.getStepX()) * eyeHeight, 0.0f, (-bedOrientation.getStepZ()) * eyeHeight);
             }
-            setupRotations(entity, poseStack, modelData.lerpedAge, modelData.lerpBodyRot, partialTick);
+            setupRotations(entity, poseStack, modelData.lerpedAge, modelData.lerpBodyRot, partialTick, 1.0f);
             if (t.getEntity().getVehicle() != null) {
                 VehicleCapability.get(t.getEntity().getVehicle()).ifPresent(cap -> {
                     Vector3f vector3f = cap.getExpressionOffset();
@@ -141,7 +141,7 @@ public abstract class GeoReplacedEntityRenderer<TEntity extends LivingEntity, T 
     public void preRenderCallback(TEntity entity, PoseStack poseStack, float partialTick) {
     }
 
-    public void setupRotations(TEntity tentity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
+    public void setupRotations(TEntity tentity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks, float scale) {
         int t = tentity.deathTime;
         boolean zIsAutoSpinAttack = tentity.isAutoSpinAttack();
         if (t > 0) {
@@ -159,7 +159,7 @@ public abstract class GeoReplacedEntityRenderer<TEntity extends LivingEntity, T 
                 }
             }
         }
-        super.setupRotations(tentity, poseStack, ageInTicks, rotationYaw, partialTicks);
+        super.setupRotations(tentity, poseStack, ageInTicks, rotationYaw, partialTicks, scale);
         if (t > 0) {
             tentity.deathTime = t;
         }

@@ -1,6 +1,8 @@
 package com.elfmcys.yesstevemodel.client.animation.molang;
 
 import com.elfmcys.yesstevemodel.capability.PlayerCapability;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.alchemy.PotionContents;
 import rip.ysm.compat.touhoulittlemaid.TouhouLittleMaidCompat;
 import com.elfmcys.yesstevemodel.util.accessors.ProjectileStateAccessor;
 import com.elfmcys.yesstevemodel.client.animation.molang.functions.ysm.*;
@@ -13,7 +15,6 @@ import com.elfmcys.yesstevemodel.geckolib3.core.molang.binding.ContextBinding;
 import com.elfmcys.yesstevemodel.geckolib3.core.molang.context.IContext;
 import com.elfmcys.yesstevemodel.geckolib3.core.molang.util.StringPool;
 import com.elfmcys.yesstevemodel.geckolib3.util.MathInterpolation;
-import com.elfmcys.yesstevemodel.mixin.client.ArrowEntityAccessor;
 import com.elfmcys.yesstevemodel.mixin.client.FishingHookAccessor;
 import com.elfmcys.yesstevemodel.mixin.client.ThrowableItemProjectileAccessor;
 import com.elfmcys.yesstevemodel.geckolib3.core.EntityFrameStateTracker;
@@ -53,6 +54,7 @@ import net.minecraft.world.phys.Vec3;
 import dev.architectury.platform.Platform;
 import rip.ysm.api.attribute.ForgeAttributes;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Locale;
@@ -379,14 +381,22 @@ public class YSMBinding extends ContextBinding {
             return null;
         }
         if (context.entity() instanceof Arrow) {
-            activeEffects = ((ArrowEntityAccessor) context.entity()).getEffects();
+            PotionContents potionContents = ((Arrow) context.entity()).getPickupItemStackOrigin().getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+            activeEffects = new ArrayList<>();
+
+            Iterable<MobEffectInstance> it = potionContents.getAllEffects();
+
+            while (it.iterator().hasNext()) {
+                MobEffectInstance next = it.iterator().next();
+                activeEffects.add(next);
+            }
         } else if (context.entity() instanceof LivingEntity) {
             activeEffects = ((LivingEntity) context.entity()).getActiveEffects();
         } else {
             return null;
         }
         for (MobEffectInstance mobEffectInstance : activeEffects) {
-            context.logWarningComponent(Component.literal("Effect: display ").append(ComponentUtils.copyOnClickText(mobEffectInstance.getEffect().getDisplayName().getString(99))).append(Component.literal("  name ").append(ComponentUtils.copyOnClickText(BuiltInRegistries.MOB_EFFECT.getKey(mobEffectInstance.getEffect()).toString()))).append("  lv=").append(String.valueOf(mobEffectInstance.getAmplifier() + 1)));
+            context.logWarningComponent(Component.literal("Effect: display ").append(ComponentUtils.copyOnClickText(mobEffectInstance.getEffect().value().getDisplayName().getString(99))).append(Component.literal("  name ").append(ComponentUtils.copyOnClickText(BuiltInRegistries.MOB_EFFECT.getKey(mobEffectInstance.getEffect().value()).toString()))).append("  lv=").append(String.valueOf(mobEffectInstance.getAmplifier() + 1)));
         }
         return null;
     }

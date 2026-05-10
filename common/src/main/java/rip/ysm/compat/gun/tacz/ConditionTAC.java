@@ -23,9 +23,9 @@ public class ConditionTAC {
             return;
         }
         String str2 = strArrSplit[1];
-        if (ResourceLocation.isValidResourceLocation(str2)) {
+        if ((ResourceLocation.tryParse(str2) != null)) {
             this.nameTest.add(name);
-            this.idTest.add(new ResourceLocation(str2));
+            this.idTest.add(ResourceLocation.parse(str2));
         }
     }
 

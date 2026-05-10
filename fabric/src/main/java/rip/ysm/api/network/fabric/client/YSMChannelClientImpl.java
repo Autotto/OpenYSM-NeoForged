@@ -1,10 +1,10 @@
 package rip.ysm.api.network.fabric.client;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.ResourceLocation;
 import rip.ysm.api.network.fabric.YSMChannelImpl;
+import rip.ysm.api.network.fabric.YSMPayload;
 
 public final class YSMChannelClientImpl {
 
@@ -12,14 +12,15 @@ public final class YSMChannelClientImpl {
     }
 
     public static void init(ResourceLocation channelId) {
-        ClientPlayNetworking.registerGlobalReceiver(channelId, (client, handler, buf, responseSender) -> YSMChannelImpl.dispatch(buf, new ClientPacketContext(client, handler.getConnection())));
+        ClientPlayNetworking.registerGlobalReceiver(YSMPayload.TYPE, (payload, context) ->
+                YSMChannelImpl.dispatch(payload.toBuf(), new ClientPacketContext(context.client(), context.player().connection.getConnection())));
     }
 
-    public static void sendToServer(ResourceLocation channelId, FriendlyByteBuf buf) {
-        ClientPlayNetworking.send(channelId, buf);
+    public static void sendToServer(YSMPayload payload) {
+        ClientPlayNetworking.send(payload);
     }
 
-    public static Packet<?> toServerboundPacket(ResourceLocation channelId, FriendlyByteBuf buf) {
-        return ClientPlayNetworking.createC2SPacket(channelId, buf);
+    public static Packet<?> toServerboundPacket(YSMPayload payload) {
+        return ClientPlayNetworking.createC2SPacket(payload);
     }
 }

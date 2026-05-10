@@ -1,8 +1,9 @@
 package com.elfmcys.yesstevemodel.audio;
 
-import com.mojang.blaze3d.audio.OggAudioStream;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.Unpooled;
+import it.unimi.dsi.fastutil.floats.FloatArrayList;
+import net.minecraft.client.sounds.JOrbisAudioStream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.BufferUtils;
@@ -17,9 +18,13 @@ public class OggVorbisAudioStream implements IAudioStreamSupport {
 
     private static final ByteBuffer EMPTY_BUFFER = BufferUtils.createByteBuffer(0);
 
-    private final OggAudioStream oggStream;
+    private final JOrbisAudioStream oggStream;
 
     private final AudioFormat audioFormat;
+
+    private final int channels;
+
+    private final FloatArrayList pendingSamples = new FloatArrayList();
 
     @Nullable
     private final AudioCacheBuilder cacheBuilder;
@@ -29,11 +34,13 @@ public class OggVorbisAudioStream implements IAudioStreamSupport {
     private boolean isEndOfStream;
 
     public OggVorbisAudioStream(ByteBuffer byteBuffer, @Nullable AudioCacheBuilder cacheBuilder) throws UnsupportedAudioFileException, IOException {
-        this.oggStream = new OggAudioStream(new ByteBufInputStream(Unpooled.wrappedBuffer(byteBuffer)));
-        if (this.oggStream.getFormat().getChannels() != 1 && this.oggStream.getFormat().getChannels() != 2) {
+        this.oggStream = new JOrbisAudioStream(new ByteBufInputStream(Unpooled.wrappedBuffer(byteBuffer)));
+        AudioFormat sourceFormat = this.oggStream.getFormat();
+        this.channels = sourceFormat.getChannels();
+        if (this.channels != 1 && this.channels != 2) {
             throw new UnsupportedAudioFileException();
         }
-        this.audioFormat = new AudioFormat(this.oggStream.getFormat().getSampleRate(), 16, 1, true, false);
+        this.audioFormat = new AudioFormat(sourceFormat.getSampleRate(), 16, 1, true, false);
         this.cacheBuilder = cacheBuilder;
     }
 
@@ -43,35 +50,59 @@ public class OggVorbisAudioStream implements IAudioStreamSupport {
     }
 
     @NotNull
-    public ByteBuffer read(int i) throws IOException {
-        ByteBuffer byteBufferCreateByteBuffer;
+    public ByteBuffer read(int requestedBytes) throws IOException {
         if (this.isEndOfStream || this.isClosed) {
             return EMPTY_BUFFER;
         }
-        ByteBuffer byteBufferSlice = this.oggStream.read(this.oggStream.getFormat().getChannels() * i);
-        if (!byteBufferSlice.hasRemaining()) {
-            if (this.cacheBuilder != null) {
+        int requestedMonoSamples = requestedBytes / 2;
+        int neededFloatSamples = requestedMonoSamples * this.channels;
+        while (this.pendingSamples.size() < neededFloatSamples) {
+            boolean more = this.oggStream.readChunk(this.pendingSamples::add);
+            if (!more) {
+                this.isEndOfStream = true;
+                break;
+            }
+        }
+        int availableFloats = Math.min(this.pendingSamples.size(), neededFloatSamples);
+        int outMonoSamples = availableFloats / this.channels;
+        int outBytes = outMonoSamples * 2;
+        if (outBytes <= 0) {
+            if (this.cacheBuilder != null && this.isEndOfStream) {
                 this.cacheBuilder.flushToCache();
             }
-            this.isEndOfStream = true;
-            return byteBufferSlice;
+            return EMPTY_BUFFER;
         }
-        if (this.oggStream.getFormat().getChannels() == 2) {
-            ByteBuffer byteBufferOrder = byteBufferSlice.duplicate().order(ByteOrder.nativeOrder());
-            if (!byteBufferSlice.isReadOnly()) {
-                byteBufferCreateByteBuffer = byteBufferSlice.duplicate().order(ByteOrder.nativeOrder()).limit(byteBufferOrder.remaining() / 2);
-            } else {
-                byteBufferCreateByteBuffer = BufferUtils.createByteBuffer(byteBufferOrder.remaining() / 2);
+        ByteBuffer out = BufferUtils.createByteBuffer(outBytes).order(ByteOrder.nativeOrder());
+        if (this.channels == 1) {
+            for (int i = 0; i < outMonoSamples; i++) {
+                float v = this.pendingSamples.getFloat(i);
+                out.putShort(floatToPcm16(v));
             }
-            byteBufferSlice = byteBufferCreateByteBuffer.slice();
-            do {
-                byteBufferCreateByteBuffer.putShort((short) Math.round((byteBufferOrder.getShort() + byteBufferOrder.getShort()) / 2.0f));
-            } while (byteBufferOrder.hasRemaining());
+        } else {
+            for (int i = 0; i < outMonoSamples; i++) {
+                float l = this.pendingSamples.getFloat(i * 2);
+                float r = this.pendingSamples.getFloat((i * 2) + 1);
+                out.putShort(floatToPcm16((l + r) * 0.5f));
+            }
         }
+        this.pendingSamples.removeElements(0, outMonoSamples * this.channels);
+        out.flip();
         if (this.cacheBuilder != null) {
-            this.cacheBuilder.appendAudio(byteBufferSlice.duplicate());
+            this.cacheBuilder.appendAudio(out.duplicate());
+            if (this.isEndOfStream) {
+                this.cacheBuilder.flushToCache();
+            }
         }
-        return byteBufferSlice;
+        return out;
+    }
+
+    private static short floatToPcm16(float v) {
+        if (v > 1.0f) {
+            v = 1.0f;
+        } else if (v < -1.0f) {
+            v = -1.0f;
+        }
+        return (short) Math.round(v * 32767.0f);
     }
 
     public void close() throws IOException {

@@ -18,9 +18,10 @@ public final class YesSteveModelFabricClient implements ClientModInitializer {
             Minecraft mc = Minecraft.getInstance();
             int w = mc.getWindow().getGuiScaledWidth();
             int h = mc.getWindow().getGuiScaledHeight();
-            debugOverlay.render(guiGraphics, mc.font, tickDelta, w, h);
-            loadingOverlay.render(guiGraphics, mc.font, tickDelta, w, h);
-            syncOverlay.render(guiGraphics, mc.font, tickDelta, w, h);
+            float partial = tickDelta.getGameTimeDeltaPartialTick(false);
+            debugOverlay.render(guiGraphics, mc.font, partial, w, h);
+            loadingOverlay.render(guiGraphics, mc.font, partial, w, h);
+            syncOverlay.render(guiGraphics, mc.font, partial, w, h);
         });
     }
 }

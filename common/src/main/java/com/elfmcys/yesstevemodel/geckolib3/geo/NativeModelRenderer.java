@@ -137,7 +137,12 @@ public class NativeModelRenderer {
                     tempNorm.set(quad.normal).mul(globalNormalMat).normalize();
                     for (int v = 0; v < 4; v++) {
                         tempPos.set(quad.positions[v].x(), quad.positions[v].y(), quad.positions[v].z(), 1.0f).mul(globalBoneMat);
-                        vertexConsumer.vertex(tempPos.x(), tempPos.y(), tempPos.z(), r, g, b, a, quad.uvs[v].x(), quad.uvs[v].y(), packedOverlay, currentPackedLight, tempNorm.x(), tempNorm.y(), tempNorm.z());
+                        vertexConsumer.addVertex(tempPos.x(), tempPos.y(), tempPos.z())
+                                .setColor(r, g, b, a)
+                                .setUv(quad.uvs[v].x(), quad.uvs[v].y())
+                                .setOverlay(packedOverlay)
+                                .setLight(currentPackedLight)
+                                .setNormal(tempNorm.x(), tempNorm.y(), tempNorm.z());
                     }
                 }
             }
@@ -215,18 +220,12 @@ public class NativeModelRenderer {
         int intIndex = 0;
 
         for (int i = 0; i < vertexCount; i++) {
-            vertexConsumer.vertex(
-                    // position
-                    fArr[floatIndex + 0], fArr[floatIndex + 1], fArr[floatIndex + 2],
-                    // rgba
-                    fArr[floatIndex + 3], fArr[floatIndex + 4], fArr[floatIndex + 5], fArr[floatIndex + 6],
-                    // uv
-                    fArr[floatIndex + 7], fArr[floatIndex + 8],
-                    // overlay light
-                    iArr[intIndex + 0], iArr[intIndex + 1],
-                    //normal
-                    fArr[floatIndex + 9], fArr[floatIndex + 10], fArr[floatIndex + 11]
-            );
+            vertexConsumer.addVertex(fArr[floatIndex + 0], fArr[floatIndex + 1], fArr[floatIndex + 2])
+                    .setColor(fArr[floatIndex + 3], fArr[floatIndex + 4], fArr[floatIndex + 5], fArr[floatIndex + 6])
+                    .setUv(fArr[floatIndex + 7], fArr[floatIndex + 8])
+                    .setOverlay(iArr[intIndex + 0])
+                    .setLight(iArr[intIndex + 1])
+                    .setNormal(fArr[floatIndex + 9], fArr[floatIndex + 10], fArr[floatIndex + 11]);
             floatIndex += 12;
             intIndex += 2;
         }

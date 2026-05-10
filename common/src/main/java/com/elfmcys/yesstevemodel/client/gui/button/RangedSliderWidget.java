@@ -12,7 +12,7 @@ import java.text.DecimalFormat;
 
 public class RangedSliderWidget extends AbstractSliderButton {
 
-    private static final ResourceLocation SLIDER_TEXTURE = new ResourceLocation("textures/gui/slider.png");
+    private static final ResourceLocation SLIDER_TEXTURE = ResourceLocation.parse("textures/gui/slider.png");
 
     protected Component prefix;
     protected Component suffix;

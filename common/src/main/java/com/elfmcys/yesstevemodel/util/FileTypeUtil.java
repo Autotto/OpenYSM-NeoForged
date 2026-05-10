@@ -61,16 +61,16 @@ public final class FileTypeUtil {
     }
 
     public static ResourceLocation getPackIconLocation(String str) {
-        return new ResourceLocation(YesSteveModel.MOD_ID, "model_pack_icon/" + str.hashCode());
+        return ResourceLocation.fromNamespaceAndPath(YesSteveModel.MOD_ID, "model_pack_icon/" + str.hashCode());
     }
 
     /**
-     * 解析 "match"字段的
+     * 瑙ｆ瀽 "match"瀛楁鐨?
      *  "match": [
      *     "minecraft:arrow",
      *     "#minecraft:arrows"
      *  ],
-     *  带#的是实体 Tag
+     *  甯?鐨勬槸瀹炰綋 Tag
      */
     public static Set<ResourceLocation> resolveEntityTypes(String[] strArr) {
         HashSet<ResourceLocation> hashSet = new HashSet<>();

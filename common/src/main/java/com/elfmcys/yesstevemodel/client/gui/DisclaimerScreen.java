@@ -32,7 +32,10 @@ public class DisclaimerScreen extends Screen {
         this.textHeight = (this.height - i) / 2;
         MutableComponent mutableComponentTranslatable = Component.translatable("gui.yes_steve_model.disclaimer.read");
         int iWidth = this.font.width(mutableComponentTranslatable);
-        this.checkbox = new Checkbox((this.width - iWidth) / 2, (this.textHeight + i) - 50, iWidth, 20, mutableComponentTranslatable, !GeneralConfig.DISCLAIMER_SHOW.get().booleanValue());
+        this.checkbox = Checkbox.builder(mutableComponentTranslatable, this.font)
+                .pos((this.width - iWidth) / 2, (this.textHeight + i) - 50)
+                .selected(!GeneralConfig.DISCLAIMER_SHOW.get().booleanValue())
+                .build();
         addRenderableWidget(this.checkbox);
         addRenderableWidget(new Button.Builder(Component.translatable("gui.yes_steve_model.disclaimer.close"), button -> {
             if (this.checkbox.selected()) {
@@ -45,8 +48,8 @@ public class DisclaimerScreen extends Screen {
     }
 
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        renderBackground(guiGraphics);
-        guiGraphics.drawWordWrap(this.font, Component.translatable("gui.yes_steve_model.disclaimer.text"), this.textY, this.textHeight, 400, -1);
+        renderBackground(guiGraphics, mouseX, mouseY, partialTick);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.drawWordWrap(this.font, Component.translatable("gui.yes_steve_model.disclaimer.text"), this.textY, this.textHeight, 400, -1);
     }
 }

@@ -2,6 +2,7 @@ package com.elfmcys.yesstevemodel.client.event;
 
 import com.elfmcys.yesstevemodel.YesSteveModel;
 import com.elfmcys.yesstevemodel.capability.ModelInfoCapability;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.LivingEntity;
@@ -11,7 +12,7 @@ public class MobEffectEvent {
     private MobEffectEvent() {
     }
 
-    public static void onEffectAdded(LivingEntity entity, MobEffect effect, int amplifier) {
+    public static void onEffectAdded(LivingEntity entity, Holder<MobEffect> effect, int amplifier) {
         if (!YesSteveModel.isAvailable() || entity.level().isClientSide()) {
             return;
         }
@@ -20,7 +21,7 @@ public class MobEffectEvent {
         }
     }
 
-    public static void onEffectRemoved(LivingEntity entity, MobEffect effect) {
+    public static void onEffectRemoved(LivingEntity entity, Holder<MobEffect> effect) {
         if (!YesSteveModel.isAvailable() || entity.level().isClientSide()) {
             return;
         }
