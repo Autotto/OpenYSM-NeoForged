@@ -339,6 +339,11 @@ public class PlayerTextureScreen extends Screen {
         this.zoom = Mth.clamp(this.zoom + (zoomDelta * this.zoom), MIN_ZOOM, MAX_ZOOM);
     }
 
+    @Override
+    protected void renderBlurredBackground(float f) {
+
+    }
+
     public boolean isPauseScreen() {
         return false;
     }

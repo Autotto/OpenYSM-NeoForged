@@ -674,6 +674,11 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         return true;
     }
 
+    @Override
+    protected void renderBlurredBackground(float f) {
+
+    }
+
     public int getCurrentPage() {
         return pageIndexMap.getOrDefault(currentPath, 0);
     }

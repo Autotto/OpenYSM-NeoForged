@@ -52,4 +52,9 @@ public class DisclaimerScreen extends Screen {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         guiGraphics.drawWordWrap(this.font, Component.translatable("gui.yes_steve_model.disclaimer.text"), this.textY, this.textHeight, 400, -1);
     }
+
+    @Override
+    protected void renderBlurredBackground(float f) {
+
+    }
 }

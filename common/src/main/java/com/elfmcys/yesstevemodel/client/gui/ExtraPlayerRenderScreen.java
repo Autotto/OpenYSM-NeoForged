@@ -158,4 +158,9 @@ public class ExtraPlayerRenderScreen extends Screen {
         ExtraPlayerRenderConfig.PLAYER_YAW_OFFSET.set(Double.valueOf(this.rotationY));
         super.onClose();
     }
+
+    @Override
+    protected void renderBlurredBackground(float f) {
+
+    }
 }
