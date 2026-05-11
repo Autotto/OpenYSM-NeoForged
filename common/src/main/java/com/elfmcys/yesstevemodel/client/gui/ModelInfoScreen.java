@@ -65,6 +65,7 @@ public class ModelInfoScreen extends Screen {
             OuterFileTexture avatar = avatars.get(authorInfo.get(i).getName());
             if (avatar != null) {
                 textureManager.register(ResourceLocation.fromNamespaceAndPath(YesSteveModel.MOD_ID, "avatars/" + i), avatar);
+                avatar.load();
                 this.textureList.add(UploadManager.getOrCreateLocatable(avatar, true));
             } else {
                 this.textureList.add(null);

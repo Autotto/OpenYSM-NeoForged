@@ -635,6 +635,7 @@ public class ClientModelManager {
                 ResourceLocation location2 = FileTypeUtil.getPackIconLocation(packData.getPath());
                 Minecraft.getInstance().submit(() -> {
                     Minecraft.getInstance().getTextureManager().register(location2, iconTexture);
+                    iconTexture.load();
                 });
             }
         }
