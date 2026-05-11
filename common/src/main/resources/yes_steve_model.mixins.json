@@ -12,6 +12,7 @@
     "client.EntityRenderDispatcherAccessor",
     "client.EntityRenderDispatcherMixin",
     "client.FishingHookAccessor",
+    "client.GuiEntityRendererMixin",
     "client.InventoryScreenMixin",
     "client.LivingEntityAccessor",
     "client.LivingRendererMixin",

@@ -125,7 +125,12 @@ public class NativeModelRenderer {
 
             for (GeoModel.BakedCube cube : bone.cubes) {
                 for (GeoModel.BakedQuad quad : cube.quads) {
-                    if (cube.cullable) {
+                    // Skip CPU back-face culling in preview/GUI contexts: the cached
+                    // projMat above is the world perspective matrix, but PIP rendering
+                    // (inventory, paper-doll, preview screens) uses an orthographic
+                    // projection set on RenderSystem at draw time. Culling against the
+                    // wrong matrix drops visible quads.
+                    if (cube.cullable && !isPreview) {
                         p1.set(quad.positions[0].x(), quad.positions[0].y(), quad.positions[0].z(), 1.0f).mul(projBoneMat);
                         p2.set(quad.positions[1].x(), quad.positions[1].y(), quad.positions[1].z(), 1.0f).mul(projBoneMat);
                         p3.set(quad.positions[2].x(), quad.positions[2].y(), quad.positions[2].z(), 1.0f).mul(projBoneMat);
