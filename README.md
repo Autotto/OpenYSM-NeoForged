@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="images/brand.png" alt="logo" width="300"/>
+  <img src="images/banner2.png" alt="logo"/>
   <h1>OpenYSM-Updated</h1>
   <p>OpenYSM 的 fabric 高版本移植</p>
 </div>
