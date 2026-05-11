@@ -482,9 +482,15 @@ public class ClientModelManager {
 
         modelAssemblyMap = Object2ReferenceMaps.emptyMap();
         modelPackMap = new Object2ReferenceOpenHashMap<>();
-//        localModelContext = null;
+        // Clear local model context and re-prime the builtin load. If we leave
+        // localModelContext non-null, getLocalModelContext() returns the stale
+        // assembly on rejoin without going through the load pipeline, which leaves
+        // the cap's animation processor with no bone snapshots → animations frozen.
+        localModelContext = null;
+        defaultTexture = null;
         pendingModelCallback = null;
         pendingModelQueue.clear();
+        loadDefaultModel();
 
         forEachGuiWidget(l -> {
             try { l.onSyncBegin(); }
