@@ -493,7 +493,7 @@ public class ClientModelManager {
     }
 
     public static SyncStatus getSyncStatus() {
-        RenderSystem.assertOnRenderThreadOrInit();
+        RenderSystem.assertOnRenderThread();
         return syncState;
     }
 

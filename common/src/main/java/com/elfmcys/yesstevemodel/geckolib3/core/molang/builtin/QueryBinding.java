@@ -73,7 +73,7 @@ public class QueryBinding extends ContextBinding {
         entityVar("has_rider", ctx -> ctx.entity().isVehicle());
         entityVar("is_first_person", ctx -> CameraUtil.getCameraType(ctx) == CameraType.FIRST_PERSON.ordinal());
         entityVar("is_in_water", ctx -> ctx.entity().isInWater());
-        entityVar("is_in_water_or_rain", ctx -> ctx.entity().isInWaterRainOrBubble());
+        entityVar("is_in_water_or_rain", ctx -> ctx.entity().isInWaterOrRain());
         entityVar("is_on_fire", ctx -> ctx.entity().isOnFire());
         entityVar("is_on_ground", ctx -> ctx.entity().onGround());
         entityVar("is_riding", ctx -> ctx.entity().isPassenger());

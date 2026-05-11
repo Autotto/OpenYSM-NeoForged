@@ -80,7 +80,7 @@ public class CustomPlayerItemInHandLayer extends GeoLayerRenderer<CustomPlayerEn
                     poseStack.translate(0.1d, 0.0d, 0.0d);
                     poseStack.scale(1.25f, 1.25f, 1.25f);
                 }
-                this.itemRenderer.renderItem(livingEntity, itemStack, itemDisplayContext, isLeftHand, poseStack, multiBufferSource, i);
+                this.itemRenderer.renderItem(livingEntity, itemStack, itemDisplayContext, poseStack, multiBufferSource, i);
             }
             poseStack.popPose();
             (isLeftHand ? model.rightHandChain() : model.leftHandChains()).forEach(list -> {
@@ -91,7 +91,7 @@ public class CustomPlayerItemInHandLayer extends GeoLayerRenderer<CustomPlayerEn
                     if (SWarfareCompat.isGunItem(itemStack)) {
                         poseStack.scale(1.25f, 1.25f, 1.25f);
                     }
-                    this.itemRenderer.renderItem(livingEntity, itemStack, itemDisplayContext, isLeftHand, poseStack, multiBufferSource, i);
+                    this.itemRenderer.renderItem(livingEntity, itemStack, itemDisplayContext, poseStack, multiBufferSource, i);
                 }
                 poseStack.popPose();
             });

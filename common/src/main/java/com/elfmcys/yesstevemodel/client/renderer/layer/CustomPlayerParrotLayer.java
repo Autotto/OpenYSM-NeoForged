@@ -51,7 +51,7 @@ public class CustomPlayerParrotLayer extends GeoLayerRenderer<CustomPlayerEntity
     private void renderParrot(PoseStack poseStack, PlayerRenderState state, MultiBufferSource bufferSource, AnimatedGeoModel model, int packedLightIn, Player player, float limbSwing, float limbSwingAmount, float netHeadYaw, float headPitch, boolean isLeftShoulder) {
         CompoundTag shoulderEntityLeft = isLeftShoulder ? player.getShoulderEntityLeft() : player.getShoulderEntityRight();
         Parrot.Variant variant = isLeftShoulder ? state.parrotOnLeftShoulder : state.parrotOnRightShoulder;
-        EntityType.byString(shoulderEntityLeft.getString(TAG_ID)).filter(entityType -> entityType == EntityType.PARROT).ifPresent(entityType -> {
+        EntityType.byString(shoulderEntityLeft.getStringOr(TAG_ID, "")).filter(entityType -> entityType == EntityType.PARROT).ifPresent(entityType -> {
             poseStack.pushPose();
             applyParrotTransform(poseStack, model, isLeftShoulder);
 //            poseStack.translate(0.0d, 1.5d, 0.0d);

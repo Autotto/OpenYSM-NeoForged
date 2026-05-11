@@ -457,10 +457,7 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         Objects.requireNonNull(this.font);
         guiGraphics.drawString(font, str, iWidth, pageY - (9 / 2), 15986656);
         String strVersionString = Platform.getMod(YesSteveModel.MOD_ID).getVersion();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0f, 0.0f, 1000.0f);
         guiGraphics.drawString(this.font, strVersionString, this.guiLeft + 2, this.guiTop + 226, ChatFormatting.DARK_GRAY.getColor().intValue());
-        guiGraphics.pose().popPose();
         if (StringUtils.isNotBlank(currentPath)) {
             int lineIndex = 0;
             List listSplit = this.font.split(Component.literal("📂 " + currentPath).withStyle(ChatFormatting.GRAY), 270);
@@ -489,15 +486,12 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         });
         if (this.searchBox.isHovered()) {
             MutableComponent mutableComponentWithStyle = Component.translatable("gui.yes_steve_model.search.tip").withStyle(ChatFormatting.GRAY);
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(0.0f, 0.0f, 4000.0f);
-            guiGraphics.renderTooltip(this.font, this.font.split(mutableComponentWithStyle, 320), mouseX, mouseY);
-            guiGraphics.pose().popPose();
+            guiGraphics.setTooltipForNextFrame(this.font, this.font.split(mutableComponentWithStyle, 320), mouseX, mouseY);
         }
     }
 
     @Override
-    protected void renderBlurredBackground() {
+    protected void renderBlurredBackground(GuiGraphics guiGraphics) {
 
     }
 
@@ -534,13 +528,9 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
     public void renderModelPreview(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         LocalPlayer localPlayer = Minecraft.getInstance().player;
         if (localPlayer != null) {
-            double guiScale = Minecraft.getInstance().getWindow().getGuiScale();
-            RenderSystem.enableScissor((int) ((this.guiLeft + 5) * guiScale), (int) (Minecraft.getInstance().getWindow().getHeight() - ((this.guiTop + 200) * guiScale)), (int) (125.0d * guiScale), (int) (171.0d * guiScale));
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(0.0f, 0.0f, 100.0f);
+            guiGraphics.enableScissor(this.guiLeft + 5, this.guiTop + 29, this.guiLeft + 130, this.guiTop + 200);
             InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, this.guiLeft + 5, this.guiTop + 29, this.guiLeft + 130, this.guiTop + 200, 70, 0.0625F, (this.guiLeft + 67) - mouseX, ((this.guiTop + 180) - 95) - mouseY, localPlayer);
-            guiGraphics.pose().popPose();
-            RenderSystem.disableScissor();
+            guiGraphics.disableScissor();
             PlayerCapability.get(localPlayer).ifPresent(cap -> {
                 List<FormattedCharSequence> listSplit = this.font.split(FormattedText.of(ClientModelManager.getModelContext(cap.getModelId()).map(it -> {
                     Metadata metadata2 = it.getModelData().getExtraInfo();

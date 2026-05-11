@@ -1,10 +1,10 @@
 package com.elfmcys.yesstevemodel.capability.fabric;
 
 import com.elfmcys.yesstevemodel.capability.VehicleModelCapability;
-import org.ladysnake.cca.api.v3.component.Component;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import org.ladysnake.cca.api.v3.component.Component;
 
 public final class VehicleModelComponent implements Component {
 
@@ -15,14 +15,12 @@ public final class VehicleModelComponent implements Component {
     }
 
     @Override
-    public void readFromNbt(CompoundTag tag, HolderLookup.Provider registries) {
-        if (tag.contains("VehicleModel", Tag.TAG_COMPOUND)) {
-            capability.deserializeNBT(tag.getCompound("VehicleModel"));
-        }
+    public void readData(ValueInput input) {
+        input.read("VehicleModel", CompoundTag.CODEC).ifPresent(capability::deserializeNBT);
     }
 
     @Override
-    public void writeToNbt(CompoundTag tag, HolderLookup.Provider registries) {
-        tag.put("VehicleModel", capability.serializeNBT());
+    public void writeData(ValueOutput output) {
+        output.store("VehicleModel", CompoundTag.CODEC, capability.serializeNBT());
     }
 }

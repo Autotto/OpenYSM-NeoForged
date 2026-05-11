@@ -1001,16 +1001,11 @@ public final class ServerModelManager {
                 }
             } else {
                 try {
-                    connection.send((Packet<?>) obj, new PacketSendListener() {
-                        public void onSuccess() {
+                    connection.send((Packet<?>) obj, (io.netty.channel.ChannelFutureListener) future -> {
+                        if (future.isSuccess()) {
                             atomicInteger.set(1);
-                            PacketSendListener.super.onSuccess();
-                        }
-
-                        @Nullable
-                        public Packet<?> onFailure() {
+                        } else {
                             atomicInteger.set(-1);
-                            return null;
                         }
                     });
                     while (atomicInteger.get() == 0) {

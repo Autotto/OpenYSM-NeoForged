@@ -15,17 +15,19 @@ public class ShieldBlockCooldownEvent {
     }
 
     public static void onLivingTick(LivingEntity entity) {
-        if (EntityDataBridge.getPersistentData(entity).contains(TAG_KEY)) {
-            int i = EntityDataBridge.getPersistentData(entity).getInt(TAG_KEY);
+        net.minecraft.nbt.CompoundTag tag = EntityDataBridge.getPersistentData(entity);
+        java.util.Optional<Integer> cooldown = tag.getInt(TAG_KEY);
+        if (cooldown.isPresent()) {
+            int i = cooldown.get();
             if (i > 0) {
-                EntityDataBridge.getPersistentData(entity).putInt(TAG_KEY, i - 1);
+                tag.putInt(TAG_KEY, i - 1);
             } else {
-                EntityDataBridge.getPersistentData(entity).remove(TAG_KEY);
+                tag.remove(TAG_KEY);
             }
         }
     }
 
     public static boolean isOnCooldown(LivingEntity livingEntity) {
-        return EntityDataBridge.getPersistentData(livingEntity).contains(TAG_KEY);
+        return EntityDataBridge.getPersistentData(livingEntity).getInt(TAG_KEY).isPresent();
     }
 }

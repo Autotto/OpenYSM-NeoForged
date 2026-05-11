@@ -15,7 +15,7 @@ import com.elfmcys.yesstevemodel.molang.runtime.ExpressionEvaluator;
 import com.elfmcys.yesstevemodel.client.animation.condition.ConditionVehicle;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Saddleable;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
@@ -59,7 +59,7 @@ public class LivingMovementAnimationPredicate implements IAnimationPredicate<Liv
         if (vehicle instanceof Pig) {
             return IAnimationPredicate.playAnimationWithLoop(event, "ride_pig", ILoopType.EDefaultLoopTypes.LOOP);
         }
-        if (vehicle instanceof Saddleable) {
+        if (vehicle instanceof Mob mob && mob.isSaddled()) {
             return IAnimationPredicate.playAnimationWithLoop(event, "ride", ILoopType.EDefaultLoopTypes.LOOP);
         }
         if (vehicle instanceof Boat) {

@@ -422,10 +422,10 @@ public class YSMBinding extends ContextBinding {
 
     public static String getShoulderParrotVariant(Player player, boolean leftShoulder) {
         CompoundTag shoulderEntityLeft = leftShoulder ? player.getShoulderEntityLeft() : player.getShoulderEntityRight();
-        return EntityType.byString(shoulderEntityLeft.getString("id")).filter(entityType -> {
+        return EntityType.byString(shoulderEntityLeft.getStringOr("id", "")).filter(entityType -> {
             return entityType == EntityType.PARROT;
         }).map(entityType2 -> {
-            return Parrot.Variant.byId(shoulderEntityLeft.getInt("Variant")).name().toLowerCase(Locale.ENGLISH);
+            return Parrot.Variant.byId(shoulderEntityLeft.getIntOr("Variant", 0)).name().toLowerCase(Locale.ENGLISH);
         }).orElse("empty");
     }
 

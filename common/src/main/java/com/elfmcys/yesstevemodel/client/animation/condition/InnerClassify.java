@@ -24,7 +24,7 @@ public class InnerClassify {
         if (SlashBladeCompat.isSlashBladeItem(itemStack)) {
             return "slashblade";
         }
-        if ((item instanceof SwordItem) || itemStack.is(ItemTagsConstants.SWORDS)) {
+        if (itemStack.is(ItemTagsConstants.SWORDS)) {
             return "sword";
         }
         if (TouhouLittleMaidCompat.isMaidItem(item)) {
@@ -33,7 +33,7 @@ public class InnerClassify {
         if ((item instanceof AxeItem) || itemStack.is(ItemTagsConstants.AXES)) {
             return "axe";
         }
-        if ((item instanceof PickaxeItem) || itemStack.is(ItemTagsConstants.PICKAXES)) {
+        if (itemStack.is(ItemTagsConstants.PICKAXES)) {
             return "pickaxe";
         }
         if ((item instanceof ShovelItem) || itemStack.is(ItemTagsConstants.SHOVELS)) {

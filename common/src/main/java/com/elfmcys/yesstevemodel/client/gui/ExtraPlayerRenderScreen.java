@@ -71,8 +71,6 @@ public class ExtraPlayerRenderScreen extends Screen {
         int boxTop = this.mouseStartY;
         int boxRight = (int) (boxLeft + (this.rotationX));
         int boxBottom = (int) (boxTop + (this.rotationX * 2.0f));
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0f, 0.0f, (-500.0f) - ((50.0f * this.rotationX) / 40.0f));
         guiGraphics.vLine((this.width / 2) - 1, -2, this.height + 2, -1610612737);
         guiGraphics.hLine(-2, this.width + 2, (this.height / 2) - 1, -1610612737);
         guiGraphics.vLine(10, -2, this.height + 2, -1610612737);
@@ -91,7 +89,6 @@ public class ExtraPlayerRenderScreen extends Screen {
             guiGraphics.drawString(this.font, formattedCharSequence, (this.width - 15) - this.font.width(formattedCharSequence), tipY, 16777215);
             tipY += 10;
         }
-        guiGraphics.pose().popPose();
         if (Minecraft.getInstance().player != null && !ExtraPlayerRenderConfig.DISABLE_PLAYER_RENDER.get().booleanValue()) {
             ModelPreviewRenderer.renderPlayerOverlay(guiGraphics, Minecraft.getInstance().player, this.mouseStartX, this.mouseStartY, this.rotationX, this.rotationY, -500, this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false));
         }
@@ -99,7 +96,7 @@ public class ExtraPlayerRenderScreen extends Screen {
     }
 
     @Override
-    protected void renderBlurredBackground() {
+    protected void renderBlurredBackground(net.minecraft.client.gui.GuiGraphics guiGraphics) {
 
     }
 

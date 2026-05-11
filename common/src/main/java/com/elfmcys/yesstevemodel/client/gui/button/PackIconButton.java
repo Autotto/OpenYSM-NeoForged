@@ -37,15 +37,12 @@ public class PackIconButton extends Button {
         guiGraphics.fillGradient(getX(), getY(), getX() + this.width, getY() + this.height, -6598176, -6598176);
         ResourceLocation location = FileTypeUtil.getPackIconLocation(this.packData.getPath());
         AbstractTexture texture = minecraft.getTextureManager().getTexture(location);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
         boolean missing = texture == null || location.equals(MissingTextureAtlasSprite.getLocation());
         if (missing) {
-            guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, default_pack_icon, getX(), getY(), 0.0f, 0.0f, this.width, this.height, this.width, this.height);
+            guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, default_pack_icon, getX(), getY(), 0.0f, 0.0f, this.width, this.height, this.width, this.height);
         } else {
-            guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, location, getX(), getY(), 0.0f, 0.0f, this.width, this.height, this.width, this.height);
+            guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, location, getX(), getY(), 0.0f, 0.0f, this.width, this.height, this.width, this.height);
         }
-        RenderSystem.disableBlend();
         List listSplit = font.split(getMessage(), 45);
         if (listSplit.size() > 1) {
             drawCenteredString(guiGraphics, font, (FormattedCharSequence) listSplit.get(0), getX() + (this.width / 2), (getY() + this.height) - 19, 5592405);
@@ -68,10 +65,7 @@ public class PackIconButton extends Button {
         }
         List<Component> listSingletonList = Collections.singletonList(Component.literal(str));
         if (isHovered()) {
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(0.0f, 0.0f, 4000.0f);
-            guiGraphics.renderComponentTooltip(Minecraft.getInstance().font, listSingletonList, mouseX, mouseY);
-            guiGraphics.pose().popPose();
+            guiGraphics.setComponentTooltipForNextFrame(Minecraft.getInstance().font, listSingletonList, mouseX, mouseY);
         }
     }
 

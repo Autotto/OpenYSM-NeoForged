@@ -67,7 +67,7 @@ public class AuthorButton extends Button {
         } else {
             guiGraphics.fillGradient(getX(), getY(), getX() + this.width, getY() + this.height, -1891417534, -1891417534);
         }
-        guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, this.resourceLocation, getX() + 3, getY() + 3, 0.0f, 0.0f, 64, 64, 64, 64);
+        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.resourceLocation, getX() + 3, getY() + 3, 0.0f, 0.0f, 64, 64, 64, 64);
         String str = ModelMetadataPresenter.getLocalizedModelString(this.modelAssembly, "metadata.authors.%d.name".formatted(this.authorIndex), this.authorInfo.getName());
         String str2 = ModelMetadataPresenter.getLocalizedModelString(this.modelAssembly, "metadata.authors.%d.role".formatted(this.authorIndex), this.authorInfo.getRole());
         String str3 = ModelMetadataPresenter.getLocalizedModelString(this.modelAssembly, "metadata.authors.%d.comment".formatted(this.authorIndex), this.authorInfo.getComment());
@@ -89,7 +89,7 @@ public class AuthorButton extends Button {
 
     public void refreshContactComponents(GuiGraphics guiGraphics, Screen screen, int mouseX, int mouseY) {
         if (this.isHovered && !this.componentList.isEmpty()) {
-            guiGraphics.renderComponentTooltip(Minecraft.getInstance().font, this.componentList, mouseX, mouseY);
+            guiGraphics.setComponentTooltipForNextFrame(Minecraft.getInstance().font, this.componentList, mouseX, mouseY);
         } else if (this.selectedContactIndex != -1) {
             this.selectedContactIndex = -1;
             renderTooltip(false);

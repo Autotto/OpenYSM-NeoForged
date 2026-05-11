@@ -54,8 +54,8 @@ public class C2SSwingArmPacket {
         if (MobEffectUtil.hasDigSpeed(entity)) {
             return 6 - (1 + MobEffectUtil.getDigSpeedAmplification(entity));
         }
-        if (entity.hasEffect(MobEffects.DIG_SLOWDOWN)) {
-            return 6 + ((1 + entity.getEffect(MobEffects.DIG_SLOWDOWN).getAmplifier()) * 2);
+        if (entity.hasEffect(MobEffects.MINING_FATIGUE)) {
+            return 6 + ((1 + entity.getEffect(MobEffects.MINING_FATIGUE).getAmplifier()) * 2);
         }
         return 6;
     }

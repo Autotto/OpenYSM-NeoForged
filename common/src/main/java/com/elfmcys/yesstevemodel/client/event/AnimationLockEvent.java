@@ -46,7 +46,11 @@ public class AnimationLockEvent {
 
     public static boolean isPlayerMoving(LocalPlayer localPlayer) {
         ClientInput input = localPlayer.input;
-        return input != null && (isSignificantImpulse(input.leftImpulse) || isSignificantImpulse(input.forwardImpulse) || input.keyPresses.jump() || input.keyPresses.shift());
+        if (input == null) {
+            return false;
+        }
+        net.minecraft.world.phys.Vec2 move = input.getMoveVector();
+        return isSignificantImpulse(move.x) || isSignificantImpulse(move.y) || input.keyPresses.jump() || input.keyPresses.shift();
     }
 
     private static boolean isSignificantImpulse(float impulse) {

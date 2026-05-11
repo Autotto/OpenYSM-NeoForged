@@ -37,7 +37,7 @@ public class OpenModelFolderScreen extends Screen {
     }
 
     @Override
-    protected void renderBlurredBackground() {
+    protected void renderBlurredBackground(net.minecraft.client.gui.GuiGraphics guiGraphics) {
 
     }
 

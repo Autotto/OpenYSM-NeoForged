@@ -370,7 +370,7 @@ public class AnimationRouletteScreen extends Screen {
         guiGraphics.drawCenteredString(this.font, Component.translatable("gui.yes_steve_model.roulette.path", StringUtils.joinWith(" > ", navigationStack.stream().map((v0) -> {
             return v0.getLeft();
         }).toArray())), this.centerX + 195, this.centerY - 100, 16777215);
-        renderRadialBackground(guiGraphics.pose(), mouseX, mouseY);
+        renderRadialBackground(guiGraphics, mouseX, mouseY);
         renderRadialButtons(guiGraphics);
         renderPageInfo(guiGraphics);
         for (Renderable renderable : ((ScreenAccessor) this).ysm$getRenderables()) {
@@ -384,20 +384,20 @@ public class AnimationRouletteScreen extends Screen {
         } else {
             scrolledMouseY = mouseY + this.configScrollOffset;
         }
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0f, -this.configScrollOffset, 0.0f);
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(0.0f, -this.configScrollOffset);
         for (Renderable renderable2 : ((ScreenAccessor) this).ysm$getRenderables()) {
             if (renderable2 instanceof ISpecialWidget) {
                 renderable2.render(guiGraphics, mouseX, scrolledMouseY, partialTick);
             }
         }
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
         guiGraphics.disableScissor();
         renderHoverTooltip(guiGraphics, mouseX, scrolledMouseY);
     }
 
     @Override
-    protected void renderBlurredBackground() {
+    protected void renderBlurredBackground(GuiGraphics guiGraphics) {
 
     }
 
@@ -405,7 +405,7 @@ public class AnimationRouletteScreen extends Screen {
         if (-1 < this.hoveredIndex && this.hoveredIndex < this.currentProperties.size()) {
             String str = ModelMetadataPresenter.getLocalizedModelString(this.renderContext, "properties.extra_animation.%s.desc".formatted(this.currentProperties.getKeyAt(this.hoveredIndex)), StringPool.EMPTY);
             if (StringUtils.isNotBlank(str)) {
-                guiGraphics.renderTooltip(this.font, this.font.split(Component.literal(str), 240), mouseX, mouseY);
+                guiGraphics.setTooltipForNextFrame(this.font, this.font.split(Component.literal(str), 240), mouseX, mouseY);
             }
         }
     }
@@ -419,7 +419,7 @@ public class AnimationRouletteScreen extends Screen {
     }
 
     private void renderPageInfo(GuiGraphics guiGraphics) {
-        guiGraphics.fill(this.centerX + 157, this.centerY - 87, this.centerX + 238, this.centerY - 72, 0, -822083584);
+        guiGraphics.fill(this.centerX + 157, this.centerY - 87, this.centerX + 238, this.centerY - 72, -822083584);
         guiGraphics.drawCenteredString(this.font, String.format("%d/%d", Integer.valueOf(this.currentNavEntry.getRight().intValue() + 1), Integer.valueOf(((this.currentProperties.size() - 1) / 8) + 1)), this.centerX + 197, this.centerY - 83, ChatFormatting.AQUA.getColor().intValue());
     }
 
@@ -636,15 +636,19 @@ public class AnimationRouletteScreen extends Screen {
         }
     }
 
-    private void renderRadialBackground(PoseStack poseStack, int mouseX, int mouseY) {
+    /**
+     * 1.21.6+ port: the legacy BufferUploader/Tesselator immediate-mode path is gone — there is no
+     * public way to submit arbitrary triangle geometry to the GUI render state without a mixin
+     * accessor. We tessellate each pie slice into K rotated thin rectangles drawn via
+     * {@code guiGraphics.fill}, using {@code pose().rotate()} so each segment lines up along the
+     * radial direction. The intra-slice angular padding (~2°) from the original code is preserved.
+     */
+    private static final int RADIAL_SUB_SEGMENTS = 24;
+
+    private void renderRadialBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (this.currentProperties.isEmpty()) {
             return;
         }
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder builder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        Matrix4f matrix4fPose = poseStack.last().pose();
         float pointerAngle = (float) Mth.atan2(mouseY - this.centerY, mouseX - this.centerX);
         if (pointerAngle < 0.0f) {
             pointerAngle = 6.2831855f + pointerAngle;
@@ -652,20 +656,21 @@ public class AnimationRouletteScreen extends Screen {
         float pointerRadius = Mth.sqrt(Mth.square(mouseY - this.centerY) + Mth.square(mouseX - this.centerX));
         boolean hoveredAny = false;
         boolean hoveredConfig = false;
-        for (int i = 0; i < Math.min(8, this.currentProperties.size() - (this.currentNavEntry.getRight().intValue() * 8)); i++) {
+        int sliceCount = Math.min(8, this.currentProperties.size() - (this.currentNavEntry.getRight().intValue() * 8));
+        for (int i = 0; i < sliceCount; i++) {
             float startAngle = ((6.2831855f / 8) * i) + 0.034906585f;
             float endAngle = ((6.2831855f / 8) * (i + 1)) - 0.034906585f;
             int iIntValue = i + (this.currentNavEntry.getRight().intValue() * 8);
-            boolean zStartsWith = this.currentProperties.getValueAt(iIntValue).startsWith(SUBMENU_PREFIX);
-            hoveredAny = checkRadialHover(startAngle, pointerAngle, endAngle, pointerRadius, hoveredAny, zStartsWith, i, builder, matrix4fPose);
+            boolean isSubmenu = this.currentProperties.getValueAt(iIntValue).startsWith(SUBMENU_PREFIX);
+            hoveredAny = checkRadialHover(guiGraphics, startAngle, pointerAngle, endAngle, pointerRadius, hoveredAny, isSubmenu, i);
             boolean isConfigSliceHovered = startAngle < pointerAngle && pointerAngle < endAngle && 20.0f < pointerRadius && pointerRadius < 50.0f;
-            if (zStartsWith) {
+            if (isSubmenu) {
                 if (isConfigSliceHovered) {
-                    drawRadialSegment(builder, matrix4fPose, 15.0f, 50.0f, startAngle, endAngle, -268382465);
+                    drawRadialSegment(guiGraphics, 15.0f, 50.0f, startAngle, endAngle, -268382465);
                     hoveredConfig = true;
                     this.hoveredConfigIndex = iIntValue;
                 } else {
-                    drawRadialSegment(builder, matrix4fPose, 25.0f, 50.0f, startAngle, endAngle, 1879101183);
+                    drawRadialSegment(guiGraphics, 25.0f, 50.0f, startAngle, endAngle, 1879101183);
                 }
             }
         }
@@ -675,11 +680,9 @@ public class AnimationRouletteScreen extends Screen {
         if (!hoveredConfig) {
             this.hoveredConfigIndex = -1;
         }
-        BufferUploader.drawWithShader(builder.buildOrThrow());
-        RenderSystem.disableBlend();
     }
 
-    private boolean checkRadialHover(float startAngle, float pointerAngle, float endAngle, float pointerRadius, boolean alreadyHovered, boolean isSubmenu, int index, BufferBuilder bufferBuilder, Matrix4f matrix4f) {
+    private boolean checkRadialHover(GuiGraphics guiGraphics, float startAngle, float pointerAngle, float endAngle, float pointerRadius, boolean alreadyHovered, boolean isSubmenu, int index) {
         boolean isHovered = startAngle < pointerAngle && pointerAngle < endAngle && 50.0f < pointerRadius && pointerRadius < 100.0f;
         if (isHovered) {
             alreadyHovered = true;
@@ -687,26 +690,37 @@ public class AnimationRouletteScreen extends Screen {
         }
         if (isHovered && index < this.currentProperties.size()) {
             if (isSubmenu) {
-                drawRadialSegment(bufferBuilder, matrix4f, 50.0f, 115.0f, startAngle, endAngle, -251678464);
-                drawRadialSegment(bufferBuilder, matrix4f, 25.0f, 50.0f, startAngle, endAngle, -1879048192);
+                drawRadialSegment(guiGraphics, 50.0f, 115.0f, startAngle, endAngle, -251678464);
+                drawRadialSegment(guiGraphics, 25.0f, 50.0f, startAngle, endAngle, -1879048192);
             } else {
-                drawRadialSegment(bufferBuilder, matrix4f, 25.0f, 115.0f, startAngle, endAngle, -251678464);
+                drawRadialSegment(guiGraphics, 25.0f, 115.0f, startAngle, endAngle, -251678464);
             }
         } else {
-            drawRadialSegment(bufferBuilder, matrix4f, 25.0f, 105.0f, startAngle, endAngle, -1879048192);
+            drawRadialSegment(guiGraphics, 25.0f, 105.0f, startAngle, endAngle, -1879048192);
         }
         return alreadyHovered;
     }
 
-    private void drawRadialSegment(BufferBuilder bufferBuilder, Matrix4f matrix4f, float innerRadius, float outerRadius, float startAngle, float endAngle, int color) {
-        float alpha = ((color >> 24) & 255) / 255.0f;
-        float red = ((color >> 16) & 255) / 255.0f;
-        float green = ((color >> 8) & 255) / 255.0f;
-        float blue = (color & 255) / 255.0f;
-        bufferBuilder.addVertex(matrix4f, this.centerX + (outerRadius * Mth.cos(startAngle)), this.centerY + (outerRadius * Mth.sin(startAngle)), 0.0f).setColor(red, green, blue, alpha);
-        bufferBuilder.addVertex(matrix4f, this.centerX + (innerRadius * Mth.cos(startAngle)), this.centerY + (innerRadius * Mth.sin(startAngle)), 0.0f).setColor(red, green, blue, alpha);
-        bufferBuilder.addVertex(matrix4f, this.centerX + (innerRadius * Mth.cos(endAngle)), this.centerY + (innerRadius * Mth.sin(endAngle)), 0.0f).setColor(red, green, blue, alpha);
-        bufferBuilder.addVertex(matrix4f, this.centerX + (outerRadius * Mth.cos(endAngle)), this.centerY + (outerRadius * Mth.sin(endAngle)), 0.0f).setColor(red, green, blue, alpha);
+    private void drawRadialSegment(GuiGraphics guiGraphics, float innerRadius, float outerRadius, float startAngle, float endAngle, int color) {
+        // Subdivide the slice angularly into thin sub-segments; each one becomes a rotated
+        // axis-aligned rectangle running radially from innerRadius..outerRadius. Sizing the
+        // tangential half-width by outerRadius (with a tiny safety scale) over-covers the inner
+        // edge so adjacent sub-segments overlap there, eliminating visible radial gaps.
+        org.joml.Matrix3x2fStack pose = guiGraphics.pose();
+        float dA = (endAngle - startAngle) / (float) RADIAL_SUB_SEGMENTS;
+        float halfWidth = outerRadius * (float) Math.sin(dA / 2.0) * 1.05f;
+        int yLow = -(int) Math.ceil(halfWidth);
+        int yHigh = (int) Math.ceil(halfWidth);
+        int xLow = Math.round(innerRadius);
+        int xHigh = Math.round(outerRadius);
+        for (int k = 0; k < RADIAL_SUB_SEGMENTS; k++) {
+            float midA = startAngle + (k + 0.5f) * dA;
+            pose.pushMatrix();
+            pose.translate(this.centerX, this.centerY);
+            pose.rotate(midA);
+            guiGraphics.fill(xLow, yLow, xHigh, yHigh, color);
+            pose.popMatrix();
+        }
     }
 
 }

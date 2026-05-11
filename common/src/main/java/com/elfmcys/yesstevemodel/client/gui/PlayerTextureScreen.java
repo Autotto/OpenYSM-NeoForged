@@ -244,12 +244,12 @@ public class PlayerTextureScreen extends Screen {
     }
 
     @Override
-    protected void renderBlurredBackground() {
+    protected void renderBlurredBackground(GuiGraphics guiGraphics) {
 
     }
 
     public void renderTexturePreview(GuiGraphics guiGraphics, int scissorX, int scissorY, int scissorWidth, int scissorHeight, float partialTick) {
-        RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
+        guiGraphics.enableScissor(scissorX, scissorY, scissorX + scissorWidth, scissorY + scissorHeight);
         PlayerCapability.get(this.minecraft.player).ifPresent(cap -> {
             this.modelHolder.initModelWithTexture(this.modelId, cap.getCurrentTextureName());
             CustomPlayerRenderer playerRenderer = RendererManager.getPlayerRenderer();
@@ -257,7 +257,7 @@ public class PlayerTextureScreen extends Screen {
             playerRenderer.extractRenderState(this.modelHolder.entity, state, partialTick);
             ModelPreviewRenderer.renderEntityPreview(this.guiLeft + 149.5f + 40.0f + this.offsetX, this.guiTop + 117.5f + 80.0f + this.offsetY, this.zoom, this.pitch, this.yaw, partialTick, this.modelHolder, state, playerRenderer, this.showGround);
         });
-        RenderSystem.disableScissor();
+        guiGraphics.disableScissor();
     }
 
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {

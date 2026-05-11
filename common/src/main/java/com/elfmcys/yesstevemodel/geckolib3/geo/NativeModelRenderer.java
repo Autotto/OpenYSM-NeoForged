@@ -27,7 +27,7 @@ public class NativeModelRenderer {
     public static void renderMesh(VertexConsumer buffer, PoseStack.Pose pose, GeoModel model, float[] boneParams, float[] stateBuffer, int textureIndex, int renderPartMask, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         OculusCompat.updatePBRState();
         boolean isCompatMode = OptiFineDetector.isOptifinePresent() || GeneralConfig.USE_COMPATIBILITY_RENDERER.get();
-        RenderSystem.getProjectionMatrix().mul(RenderSystem.getModelViewMatrix(), projectionModelViewMatrix);
+        net.minecraft.client.Minecraft.getInstance().gameRenderer.getProjectionMatrix(net.minecraft.client.Minecraft.getInstance().options.fov().get()).mul(RenderSystem.getModelViewMatrix(), projectionModelViewMatrix);
         boolean isPreview = ModelPreviewRenderer.isPreview() || ModelPreviewRenderer.isExtraPlayer();
         if (/*NativeLibLoader.isLoaded()*/false) { // WIP: SIMD MODEL RENDER
 
@@ -83,7 +83,7 @@ public class NativeModelRenderer {
         // TODO: 修復GC壓力
         Matrix4f rootPoseMat = pose.pose();
         Matrix3f rootNormalMC = pose.normal();
-        Matrix4f projMat = RenderSystem.getProjectionMatrix();
+        Matrix4f projMat = net.minecraft.client.Minecraft.getInstance().gameRenderer.getProjectionMatrix(net.minecraft.client.Minecraft.getInstance().options.fov().get());
 
         Matrix4f identityMat = new Matrix4f();
         Matrix4f globalBoneMat = new Matrix4f();
@@ -240,7 +240,7 @@ public class NativeModelRenderer {
 
         if (mesh.nativeModelHandle == 0) return;
 
-        Matrix4f projMat = RenderSystem.getProjectionMatrix();
+        Matrix4f projMat = net.minecraft.client.Minecraft.getInstance().gameRenderer.getProjectionMatrix(net.minecraft.client.Minecraft.getInstance().options.fov().get());
 
         pose.pose().get(matrixTransferArray, 0);
         pose.normal().get(matrixTransferArray, 16);

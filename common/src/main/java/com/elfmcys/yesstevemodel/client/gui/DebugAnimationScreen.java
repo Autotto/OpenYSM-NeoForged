@@ -36,7 +36,7 @@ public class DebugAnimationScreen extends Screen {
     }
 
     @Override
-    protected void renderBlurredBackground() {
+    protected void renderBlurredBackground(GuiGraphics guiGraphics) {
 
     }
 

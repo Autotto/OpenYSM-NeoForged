@@ -171,24 +171,17 @@ public class ModelButton extends Button {
         int y = getY();
         guiGraphics.fillGradient(x, y, x + this.width, y + this.height, this.backgroundColor, this.backgroundColor);
         if (this.backgroundTexture != null) {
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, this.backgroundTexture.getResourceLocation().get(), x, y, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
-            RenderSystem.disableBlend();
+            guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.backgroundTexture.getResourceLocation().get(), x, y, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
         }
         double guiScale = Minecraft.getInstance().getWindow().getGuiScale();
-        RenderSystem.enableScissor((int) (x * guiScale), (int) (Minecraft.getInstance().getWindow().getHeight() - (((y + this.height) - 20) * guiScale)), (int) (this.width * guiScale), (int) ((this.height - 20) * guiScale));
+        guiGraphics.enableScissor(x, y, x + this.width, (y + this.height) - 20);
         CustomPlayerRenderer playerRenderer = RendererManager.getPlayerRenderer();
         PlayerRenderState state = new PlayerRenderState();
         playerRenderer.extractRenderState(this.modelIdHolder.entity, state, partialTick);
         ModelPreviewRenderer.renderLivingEntityPreview(x + (this.width / 2.0f), y + (this.height / 2.0f) + 20.0f, 30.0f, minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false), this.modelIdHolder, state, playerRenderer, this.disablePreviewRotation, true);
-        RenderSystem.disableScissor();
-        int starZ = 3500;
+        guiGraphics.disableScissor();
         if (this.foregroundTexture != null) {
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, this.foregroundTexture.getResourceLocation().get(), x, y, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
-            RenderSystem.disableBlend();
+            guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.foregroundTexture.getResourceLocation().get(), x, y, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
         }
         List listSplit = font.split(getMessage(), 45);
         if (listSplit.size() > 1) {
@@ -198,18 +191,18 @@ public class ModelButton extends Button {
             guiGraphics.drawCenteredString(font, getMessage(), x + (this.width / 2), (y + this.height) - 15, 15986656);
         }
         if (!this.isStarred && isHoveredOrFocused()) {
-            guiGraphics.fillGradient(x, y + 1, x + 1, (y + this.height) - 1, 3500, -790560, -790560);
-            guiGraphics.fillGradient(x, y, x + this.width, y + 1, 3500, -790560, -790560);
-            guiGraphics.fillGradient((x + this.width) - 1, y + 1, x + this.width, (y + this.height) - 1, 3500, -790560, -790560);
-            guiGraphics.fillGradient(x, (y + this.height) - 1, x + this.width, y + this.height, 3500, -790560, -790560);
+            guiGraphics.fillGradient(x, y + 1, x + 1, (y + this.height) - 1, -790560, -790560);
+            guiGraphics.fillGradient(x, y, x + this.width, y + 1, -790560, -790560);
+            guiGraphics.fillGradient((x + this.width) - 1, y + 1, x + this.width, (y + this.height) - 1, -790560, -790560);
+            guiGraphics.fillGradient(x, (y + this.height) - 1, x + this.width, y + this.height, -790560, -790560);
         }
         if (this.isStarred) {
-            guiGraphics.fillGradient(x, y, x + this.width, y + this.height, 3500, -1625152990, -1625152990);
+            guiGraphics.fillGradient(x, y, x + this.width, y + this.height, -1625152990, -1625152990);
         }
         if (minecraft.player != null) {
             StarModelsCapability.get(minecraft.player).ifPresent(cap -> {
                 if (cap.containsModel(this.modelIdHolder.getModelId())) {
-                    guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, ICON_TEXTURE, (x + this.width) - 14, y, 16.0f, 0.0f, 16, 16, 256, 256);
+                    guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, ICON_TEXTURE, (x + this.width) - 14, y, 16.0f, 0.0f, 16, 16, 256, 256);
                 }
             });
         }
@@ -217,8 +210,6 @@ public class ModelButton extends Button {
 
     public void renderTooltip(GuiGraphics guiGraphics, Screen screen, int mouseX, int mouseY) {
         if (isHovered()) {
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(0.0f, 0.0f, 4000.0f);
             String selected = Minecraft.getInstance().getLanguageManager().getSelected();
             if (!Objects.equals(this.cachedLanguage, selected)) {
                 this.cachedLanguage = selected;
@@ -229,14 +220,13 @@ public class ModelButton extends Button {
                 if (this.detailedTooltipLines == null) {
                     this.detailedTooltipLines = ModelMetadataPresenter.buildModelTooltip(this.renderContext, selected, this.modelIdHolder.getModelId(), true);
                 }
-                guiGraphics.renderComponentTooltip(Minecraft.getInstance().font, this.detailedTooltipLines, mouseX, mouseY);
+                guiGraphics.setComponentTooltipForNextFrame(Minecraft.getInstance().font, this.detailedTooltipLines, mouseX, mouseY);
             } else {
                 if (this.tooltipLines == null) {
                     this.tooltipLines = ModelMetadataPresenter.buildModelTooltip(this.renderContext, selected, this.modelIdHolder.getModelId(), false);
                 }
-                guiGraphics.renderComponentTooltip(Minecraft.getInstance().font, this.tooltipLines, mouseX, mouseY);
+                guiGraphics.setComponentTooltipForNextFrame(Minecraft.getInstance().font, this.tooltipLines, mouseX, mouseY);
             }
-            guiGraphics.pose().popPose();
         }
     }
 

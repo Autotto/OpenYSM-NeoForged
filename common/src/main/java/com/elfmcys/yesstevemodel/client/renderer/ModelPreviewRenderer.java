@@ -134,7 +134,7 @@ public final class ModelPreviewRenderer {
         livingEntity.yHeadRot = -yaw;
         livingEntity.yHeadRotO = -yaw;
 
-        Lighting.setupForEntityInInventory();
+        // TODO 1.21.6+ port: Lighting setup is now driven by GUI render state; no-op for now.
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         rotationX.conjugate();
         entityRenderDispatcher.overrideCameraOrientation(rotationX);
@@ -192,7 +192,7 @@ public final class ModelPreviewRenderer {
         livingEntity.setPose(oldPose);
 
         modelViewStack.popMatrix();
-        Lighting.setupFor3DItems();
+        // TODO 1.21.6+ port: Lighting reset no longer needed in deferred GUI flow.
         setPreviewMode(false);
     }
 
@@ -284,17 +284,8 @@ public final class ModelPreviewRenderer {
             savedEquipment = new ItemStack[EquipmentSlot.values().length];
             int slotIndex = 0;
             for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
-                if (equipmentSlot == EquipmentSlot.MAINHAND) {
-                    player.getInventory().items.set(player.getInventory().selected, ItemStack.EMPTY);
-                } else if (equipmentSlot == EquipmentSlot.OFFHAND) {
-                    player.getInventory().offhand.set(0, ItemStack.EMPTY);
-                } else {
-                    NonNullList<ItemStack> armorList = player.getInventory().armor;
-                    if (armorList.size() > equipmentSlot.getIndex()) {
-                        armorList.set(equipmentSlot.getIndex(), ItemStack.EMPTY);
-                    }
-                }
-                savedEquipment[slotIndex] = player.getItemBySlot(equipmentSlot);
+                savedEquipment[slotIndex] = player.getItemBySlot(equipmentSlot).copy();
+                player.setItemSlot(equipmentSlot, ItemStack.EMPTY);
                 slotIndex++;
             }
         } else {
@@ -319,7 +310,7 @@ public final class ModelPreviewRenderer {
             livingEntity.yHeadRotO = vehicleYaw;
         }
 
-        Lighting.setupForEntityInInventory();
+        // TODO 1.21.6+ port: Lighting setup is now driven by GUI render state; no-op for now.
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         rotationX.conjugate();
         entityRenderDispatcher.overrideCameraOrientation(rotationX);
@@ -343,22 +334,13 @@ public final class ModelPreviewRenderer {
             int slotIndex = 0;
             for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
                 ItemStack itemStack = savedEquipment[slotIndex];
-                if (equipmentSlot == EquipmentSlot.MAINHAND) {
-                    player.getInventory().items.set(player.getInventory().selected, itemStack);
-                } else if (equipmentSlot == EquipmentSlot.OFFHAND) {
-                    player.getInventory().offhand.set(0, itemStack);
-                } else {
-                    NonNullList<ItemStack> armorList = player.getInventory().armor;
-                    if (armorList.size() > equipmentSlot.getIndex()) {
-                        armorList.set(equipmentSlot.getIndex(), itemStack);
-                    }
-                }
+                player.setItemSlot(equipmentSlot, itemStack);
                 slotIndex++;
             }
         }
 
         modelViewStack.popMatrix();
-        Lighting.setupFor3DItems();
+        // TODO 1.21.6+ port: Lighting reset no longer needed in deferred GUI flow.
         setPreviewMode(false);
     }
 
@@ -366,35 +348,33 @@ public final class ModelPreviewRenderer {
     public static void renderPlayerOverlay(GuiGraphics guiGraphics, LocalPlayer localPlayer, double x, double y, float scale, float yawOffset, int zDepth, float partialTick) {
         setExtraPlayerMode(true);
 
-        guiGraphics.flush();
-
         Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
         modelViewStack.pushMatrix();
         modelViewStack.translate((float) (x + (scale * 0.5d)), (float) (y + (scale * 2.0f)), 0.0f);
         modelViewStack.scale(1.0f, 1.0f, -1.0f);
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0f, 0.0f, -zDepth);
-        guiGraphics.pose().scale(scale, scale, scale);
+        // 1.21.6+: GuiGraphics#pose() is a Matrix3x2fStack (2D only). Use a dedicated PoseStack
+        // for the 3D entity render and let modelViewStack carry the screen-space placement.
+        PoseStack poseStack = new PoseStack();
+        poseStack.translate(0.0f, 0.0f, -zDepth);
+        poseStack.scale(scale, scale, scale);
 
         Quaternionf rotationZ = Axis.ZP.rotationDegrees(180.1f);
         Quaternionf rotationY = Axis.YP.rotationDegrees((Mth.lerp(partialTick, localPlayer.yBodyRotO, localPlayer.yBodyRot) + yawOffset) - 180.0f);
         rotationZ.mul(rotationY);
-        guiGraphics.pose().mulPose(rotationZ);
+        poseStack.mulPose(rotationZ);
 
-        Lighting.setupForEntityInInventory();
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         rotationY.conjugate();
         entityRenderDispatcher.overrideCameraOrientation(rotationY);
         entityRenderDispatcher.setRenderShadow(false);
 
-        entityRenderDispatcher.render(localPlayer, 0.0d, 0.0d, 0.0d, partialTick, guiGraphics.pose(), Minecraft.getInstance().renderBuffers().bufferSource(), 15728880);
+        MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+        entityRenderDispatcher.render(localPlayer, 0.0d, 0.0d, 0.0d, partialTick, poseStack, bufferSource, 15728880);
+        bufferSource.endBatch();
 
-        guiGraphics.flush();
         entityRenderDispatcher.setRenderShadow(true);
-        guiGraphics.pose().popPose();
         modelViewStack.popMatrix();
-        Lighting.setupFor3DItems();
         setExtraPlayerMode(false);
     }
 }

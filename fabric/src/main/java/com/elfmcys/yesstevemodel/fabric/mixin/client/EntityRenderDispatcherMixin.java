@@ -21,10 +21,7 @@ public abstract class EntityRenderDispatcherMixin implements EntityRenderDispatc
 
     @Inject(
             method = "render(Lnet/minecraft/world/entity/Entity;DDDFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/renderer/entity/EntityRenderer;)V",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/entity/EntityRenderer;render(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"
-            )
+            at = @At("HEAD")
     )
     private <E extends Entity, S extends EntityRenderState> void ysm$onRenderPlayerPre(E entity, double d, double e, double f, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, EntityRenderer<? super E, S> entityRenderer, CallbackInfo ci) {
         ysm$lastRenderingEntity = entity;

@@ -26,8 +26,8 @@
     "yes_steve_model_fabric.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.16.10",
-    "minecraft": "~1.21.4",
+    "fabricloader": ">=0.17.0",
+    "minecraft": "~1.21.8",
     "java": ">=21"
   },
   "suggests": {

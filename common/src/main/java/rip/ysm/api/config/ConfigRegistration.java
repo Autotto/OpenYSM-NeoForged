@@ -2,7 +2,7 @@ package rip.ysm.api.config;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.config.ModConfig;
+import net.neoforged.fml.config.ModConfig;
 
 public final class ConfigRegistration {
 

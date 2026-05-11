@@ -145,8 +145,8 @@ public class RangedSliderWidget extends AbstractSliderButton {
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         Minecraft mc = Minecraft.getInstance();
-        guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, SLIDER_TEXTURE, this.getX(), this.getY(), 0, textureBaseY(), this.width, this.height, 200, 20);
-        guiGraphics.blit(net.minecraft.client.renderer.RenderType::guiTextured, SLIDER_TEXTURE, this.getX() + (int) (this.value * (double) (this.width - 8)), this.getY(), 0, handleTextureBaseY(), 8, this.height, 200, 20);
+        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, SLIDER_TEXTURE, this.getX(), this.getY(), 0, textureBaseY(), this.width, this.height, 200, 20);
+        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, SLIDER_TEXTURE, this.getX() + (int) (this.value * (double) (this.width - 8)), this.getY(), 0, handleTextureBaseY(), 8, this.height, 200, 20);
         int color = 16777215 | Mth.ceil(this.alpha * 255.0F) << 24;
         guiGraphics.drawCenteredString(mc.font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, color);
     }

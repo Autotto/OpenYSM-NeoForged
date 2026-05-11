@@ -1,8 +1,8 @@
 package rip.ysm.api.config.fabric;
 
-import fuzs.forgeconfigapiport.fabric.api.forge.v4.ForgeConfigRegistry;
+import fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.config.ModConfig;
+import net.neoforged.fml.config.ModConfig;
 
 public final class ConfigRegistrationImpl {
 
@@ -10,6 +10,6 @@ public final class ConfigRegistrationImpl {
     }
 
     public static void register(String modId, ModConfig.Type type, ForgeConfigSpec spec) {
-        ForgeConfigRegistry.INSTANCE.register(modId, type, spec);
+        ConfigRegistry.INSTANCE.register(modId, type, spec);
     }
 }

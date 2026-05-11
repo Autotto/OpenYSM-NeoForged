@@ -52,7 +52,7 @@ public class CustomPlayerArmorLayer extends GeoLayerRenderer<CustomPlayerEntity>
         RenderUtils.prepMatrixForLocator(poseStack, model.headBones());
         poseStack.scale(0.625f, 0.625f, 0.625f);
         poseStack.translate(0.0f, 0.25f, 0.0f);
-        this.itemRenderer.renderItem(player, stack, ItemDisplayContext.HEAD, false, poseStack, bufferSource, i);
+        this.itemRenderer.renderItem(player, stack, ItemDisplayContext.HEAD, poseStack, bufferSource, i);
         poseStack.popPose();
     }
 }
