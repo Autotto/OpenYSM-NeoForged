@@ -56,7 +56,6 @@ public class CustomPlayerParrotLayer extends GeoLayerRenderer<CustomPlayerEntity
             applyParrotTransform(poseStack, model, isLeftShoulder);
 //            poseStack.translate(0.0d, 1.5d, 0.0d);
             poseStack.mulPose(Axis.ZP.rotationDegrees(180.0f));
-            // TODO 1.21.4 port: ParrotModel.renderOnShoulder signature changed to take a render state. Commented out as placeholder.
             this.renderOnShoulder(poseStack, bufferSource, packedLightIn, state, variant, headPitch, netHeadYaw, isLeftShoulder);
             poseStack.popPose();
         });

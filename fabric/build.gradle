@@ -1,5 +1,5 @@
 plugins {
-    id 'com.github.johnrengelman.shadow'
+    id 'com.gradleup.shadow'
 }
 
 architectury {
@@ -50,8 +50,9 @@ dependencies {
 
     // Pull common's compile output (named/mojmap) into fabric for both compile and dev-runtime.
     common(project(path: ':common', configuration: 'namedElements')) { transitive = false }
-    // Bundle common's classes into the final jar via shadow + remap.
-    shadowBundle project(path: ':common', configuration: 'namedElements')
+    // Must use transformProductionFabric (not namedElements) so architectury rewrites
+    // @ExpectPlatform stubs to delegate to *Impl — otherwise runtime AssertionError.
+    shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
 }
 
 processResources {
