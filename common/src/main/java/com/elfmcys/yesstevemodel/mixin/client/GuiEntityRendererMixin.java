@@ -6,6 +6,7 @@ import com.elfmcys.yesstevemodel.client.renderer.ModelPreviewRenderer;
 import com.elfmcys.yesstevemodel.client.renderer.PreviewEntityRegistry;
 import com.elfmcys.yesstevemodel.client.renderer.RendererManager;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.GuiEntityRenderer;
 import net.minecraft.client.gui.render.state.pip.GuiEntityRenderState;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -76,7 +77,13 @@ public class GuiEntityRendererMixin {
                     entry.beforeEntity().render(poseStack, bufferSource, packedLight);
                 }
                 CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
-                renderer.renderEntity(entry.animatable(), playerState, 0.0f, 1.0f, poseStack, bufferSource, packedLight);
+                // Use the live frame partialTick so processAnimation interpolates
+                // walkAnimation / modelData.lerpedAge per frame instead of snapping
+                // to tick boundaries. Without this the HUD paper doll (and any
+                // other live-player preview) animates jitterily at the tick rate
+                // rather than smoothly at the frame rate.
+                float framePartialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+                renderer.renderEntity(entry.animatable(), playerState, 0.0f, framePartialTick, poseStack, bufferSource, packedLight);
                 if (entry.afterEntity() != null) {
                     entry.afterEntity().render(poseStack, bufferSource, packedLight);
                 }
