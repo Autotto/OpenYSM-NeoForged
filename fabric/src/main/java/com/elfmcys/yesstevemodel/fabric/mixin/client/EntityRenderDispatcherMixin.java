@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityRenderDispatcher.class)
 public abstract class EntityRenderDispatcherMixin implements EntityRenderDispatcherAccessor {
@@ -24,6 +25,11 @@ public abstract class EntityRenderDispatcherMixin implements EntityRenderDispatc
             at = @At("HEAD")
     )
     private <E extends Entity, S extends EntityRenderState> void ysm$onRenderPlayerPre(E entity, double d, double e, double f, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, EntityRenderer<? super E, S> entityRenderer, CallbackInfo ci) {
+        ysm$lastRenderingEntity = entity;
+    }
+
+    @Inject(method = "getRenderer(Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/client/renderer/entity/EntityRenderer;", at = @At("HEAD"))
+    private <T extends Entity> void ysm$onGetRenderer(T entity, CallbackInfoReturnable<EntityRenderer<? super T, ?>> cir) {
         ysm$lastRenderingEntity = entity;
     }
 

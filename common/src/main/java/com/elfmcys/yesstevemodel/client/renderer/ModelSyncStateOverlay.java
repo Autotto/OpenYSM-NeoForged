@@ -116,6 +116,6 @@ public class ModelSyncStateOverlay implements HudOverlay {
             case TOP_CENTER, BOTTOM_CENTER -> (screenWidth - textWidth) / 2;
             case TOP_RIGHT, BOTTOM_RIGHT -> baseX - textWidth;
         };
-        guiGraphics.drawString(font, textComponent, drawX, textY, 16777215);
+        guiGraphics.drawString(font, textComponent, drawX, textY, -1);
     }
 }

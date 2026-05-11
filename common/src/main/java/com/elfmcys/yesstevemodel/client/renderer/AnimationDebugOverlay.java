@@ -155,8 +155,8 @@ public class AnimationDebugOverlay {
         } else {
             guiGraphics.fill(2, currentY[0] - 1, screenWidth, currentY[0] + 9, -1068474288);
         }
-        guiGraphics.drawString(font, key, 5, currentY[0], 16777215);
-        guiGraphics.drawString(font, value, screenWidth / 2, currentY[0], 16777215);
+        guiGraphics.drawString(font, key, 5, currentY[0], -1);
+        guiGraphics.drawString(font, value, screenWidth / 2, currentY[0], -1);
         currentY[0] = currentY[0] + 10;
     }
 }

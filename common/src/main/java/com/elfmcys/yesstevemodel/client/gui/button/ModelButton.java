@@ -174,21 +174,25 @@ public class ModelButton extends Button {
             guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.backgroundTexture.getResourceLocation().get(), x, y, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
         }
         double guiScale = Minecraft.getInstance().getWindow().getGuiScale();
-        guiGraphics.enableScissor(x, y, x + this.width, (y + this.height) - 20);
-        CustomPlayerRenderer playerRenderer = RendererManager.getPlayerRenderer();
-        PlayerRenderState state = new PlayerRenderState();
-        playerRenderer.extractRenderState(this.modelIdHolder.entity, state, partialTick);
-        ModelPreviewRenderer.renderLivingEntityPreview(x + (this.width / 2.0f), y + (this.height / 2.0f) + 20.0f, 30.0f, minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false), this.modelIdHolder, state, playerRenderer, this.disablePreviewRotation, true);
-        guiGraphics.disableScissor();
+        // TODO 1.21.8 port: disabled to isolate GUI render-state corruption.
+        // ModelPreviewRenderer.renderLivingEntityPreview still uses the 1.21.4
+        // immediate-mode path (RenderSystem.getModelViewStack + bufferSource.endBatch)
+        // which leaks state into the deferred GuiRenderer.
+        // guiGraphics.enableScissor(x, y, x + this.width, (y + this.height) - 20);
+        // CustomPlayerRenderer playerRenderer = RendererManager.getPlayerRenderer();
+        // PlayerRenderState state = new PlayerRenderState();
+        // playerRenderer.extractRenderState(this.modelIdHolder.entity, state, partialTick);
+        // ModelPreviewRenderer.renderLivingEntityPreview(x + (this.width / 2.0f), y + (this.height / 2.0f) + 20.0f, 30.0f, minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false), this.modelIdHolder, state, playerRenderer, this.disablePreviewRotation, true);
+        // guiGraphics.disableScissor();
         if (this.foregroundTexture != null) {
             guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.foregroundTexture.getResourceLocation().get(), x, y, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
         }
         List listSplit = font.split(getMessage(), 45);
         if (listSplit.size() > 1) {
-            guiGraphics.drawCenteredString(font, (FormattedCharSequence) listSplit.get(0), x + (this.width / 2), (y + this.height) - 19, 15986656);
-            guiGraphics.drawCenteredString(font, (FormattedCharSequence) listSplit.get(1), x + (this.width / 2), (y + this.height) - 10, 15986656);
+            guiGraphics.drawCenteredString(font, (FormattedCharSequence) listSplit.get(0), x + (this.width / 2), (y + this.height) - 19, 0xFFF3F0E0);
+            guiGraphics.drawCenteredString(font, (FormattedCharSequence) listSplit.get(1), x + (this.width / 2), (y + this.height) - 10, 0xFFF3F0E0);
         } else {
-            guiGraphics.drawCenteredString(font, getMessage(), x + (this.width / 2), (y + this.height) - 15, 15986656);
+            guiGraphics.drawCenteredString(font, getMessage(), x + (this.width / 2), (y + this.height) - 15, 0xFFF3F0E0);
         }
         if (!this.isStarred && isHoveredOrFocused()) {
             guiGraphics.fillGradient(x, y + 1, x + 1, (y + this.height) - 1, -790560, -790560);

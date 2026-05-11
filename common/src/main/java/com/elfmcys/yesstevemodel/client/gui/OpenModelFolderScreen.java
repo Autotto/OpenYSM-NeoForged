@@ -32,7 +32,7 @@ public class OpenModelFolderScreen extends Screen {
 
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawWordWrap(this.font, Component.translatable("gui.yes_steve_model.open_model_folder.tips"), (this.width - 400) / 2, (this.height / 2) - 80, 400, 16777215);
+        guiGraphics.drawWordWrap(this.font, Component.translatable("gui.yes_steve_model.open_model_folder.tips"), (this.width - 400) / 2, (this.height / 2) - 80, 400, -1);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 

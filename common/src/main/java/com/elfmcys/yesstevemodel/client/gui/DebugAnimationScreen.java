@@ -31,7 +31,7 @@ public class DebugAnimationScreen extends Screen {
 
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawCenteredString(this.font, "Coming Soooooooooooooooooooooooooon™", this.width / 2, (this.height / 2) - 5, ChatFormatting.DARK_RED.getColor().intValue());
+        guiGraphics.drawCenteredString(this.font, "Coming Soooooooooooooooooooooooooon™", this.width / 2, (this.height / 2) - 5, ChatFormatting.DARK_RED.getColor().intValue() | 0xFF000000);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 

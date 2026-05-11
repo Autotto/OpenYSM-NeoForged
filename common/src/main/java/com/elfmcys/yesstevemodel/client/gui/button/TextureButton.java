@@ -54,10 +54,10 @@ public class TextureButton extends Button {
         MutableComponent mutableComponentLiteral = Component.literal(ModelMetadataPresenter.getLocalizedModelString(this.modelAssembly, "files.player.texture.%s".formatted(str), str));
         List listSplit = font.split(mutableComponentLiteral, 50);
         if (listSplit.size() > 1) {
-            guiGraphics.drawCenteredString(font, (FormattedCharSequence) listSplit.get(0), getX() + (this.width / 2), (getY() + this.height) - 19, 15986656);
-            guiGraphics.drawCenteredString(font, (FormattedCharSequence) listSplit.get(1), getX() + (this.width / 2), (getY() + this.height) - 10, 15986656);
+            guiGraphics.drawCenteredString(font, (FormattedCharSequence) listSplit.get(0), getX() + (this.width / 2), (getY() + this.height) - 19, 0xFFF3F0E0);
+            guiGraphics.drawCenteredString(font, (FormattedCharSequence) listSplit.get(1), getX() + (this.width / 2), (getY() + this.height) - 10, 0xFFF3F0E0);
         } else {
-            guiGraphics.drawCenteredString(font, mutableComponentLiteral, getX() + (this.width / 2), (getY() + this.height) - 15, 15986656);
+            guiGraphics.drawCenteredString(font, mutableComponentLiteral, getX() + (this.width / 2), (getY() + this.height) - 15, 0xFFF3F0E0);
         }
         if (isHoveredOrFocused()) {
             guiGraphics.fillGradient(getX(), getY() + 1, getX() + 1, (getY() + this.height) - 1, -790560, -790560);
@@ -68,11 +68,14 @@ public class TextureButton extends Button {
     }
 
     public void renderPlayerPreview(GuiGraphics guiGraphics, float partialTick) {
-        guiGraphics.enableScissor(getX(), getY(), getX() + this.width, (getY() + this.height) - 20);
-        CustomPlayerRenderer playerRenderer = RendererManager.getPlayerRenderer();
-        PlayerRenderState state = new PlayerRenderState();
-        playerRenderer.extractRenderState(this.previewEntity.entity, state, partialTick);
-        ModelPreviewRenderer.renderLivingEntityPreview(getX() + (this.width / 2.0f), getY() + (this.height / 2.0f) + 24.0f, 35.0f, partialTick, this.previewEntity, state, playerRenderer, false, true);
-        guiGraphics.disableScissor();
+        // TODO 1.21.8 port: disabled to isolate GUI render-state corruption.
+        // ModelPreviewRenderer.renderLivingEntityPreview still uses the 1.21.4
+        // immediate-mode path; see ModelButton.renderWidget for details.
+        // guiGraphics.enableScissor(getX(), getY(), getX() + this.width, (getY() + this.height) - 20);
+        // CustomPlayerRenderer playerRenderer = RendererManager.getPlayerRenderer();
+        // PlayerRenderState state = new PlayerRenderState();
+        // playerRenderer.extractRenderState(this.previewEntity.entity, state, partialTick);
+        // ModelPreviewRenderer.renderLivingEntityPreview(getX() + (this.width / 2.0f), getY() + (this.height / 2.0f) + 24.0f, 35.0f, partialTick, this.previewEntity, state, playerRenderer, false, true);
+        // guiGraphics.disableScissor();
     }
 }

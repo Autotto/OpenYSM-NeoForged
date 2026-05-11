@@ -59,7 +59,7 @@ public class AuthorButton extends Button {
         Font font = Minecraft.getInstance().font;
         if (this.authorInfo == null || this.modelAssembly == null || this.resourceLocation == null) {
             guiGraphics.fillGradient(getX(), getY(), getX() + this.width, getY() + this.height, -1891417534, -1891417534);
-            guiGraphics.drawCenteredString(font, Component.literal("......"), getX() + (this.width / 2), getY() + (this.height / 2), ChatFormatting.GRAY.getColor().intValue());
+            guiGraphics.drawCenteredString(font, Component.literal("......"), getX() + (this.width / 2), getY() + (this.height / 2), ChatFormatting.GRAY.getColor().intValue() | 0xFF000000);
             return;
         }
         if (isHoveredOrFocused()) {
@@ -71,8 +71,8 @@ public class AuthorButton extends Button {
         String str = ModelMetadataPresenter.getLocalizedModelString(this.modelAssembly, "metadata.authors.%d.name".formatted(this.authorIndex), this.authorInfo.getName());
         String str2 = ModelMetadataPresenter.getLocalizedModelString(this.modelAssembly, "metadata.authors.%d.role".formatted(this.authorIndex), this.authorInfo.getRole());
         String str3 = ModelMetadataPresenter.getLocalizedModelString(this.modelAssembly, "metadata.authors.%d.comment".formatted(this.authorIndex), this.authorInfo.getComment());
-        renderScrollingString(guiGraphics, font, Component.literal(str), getX() + 2, getY() + 72, (getX() + this.width) - 2, getY() + 82, ChatFormatting.GOLD.getColor().intValue());
-        guiGraphics.drawCenteredString(font, str2, getX() + 35, getY() + 82, ChatFormatting.GREEN.getColor().intValue());
+        renderScrollingString(guiGraphics, font, Component.literal(str), getX() + 2, getY() + 72, (getX() + this.width) - 2, getY() + 82, ChatFormatting.GOLD.getColor().intValue() | 0xFF000000);
+        guiGraphics.drawCenteredString(font, str2, getX() + 35, getY() + 82, ChatFormatting.GREEN.getColor().intValue() | 0xFF000000);
         drawWrappedText(guiGraphics, Component.literal(str3), getX() + 3, getY() + 95, 64, -1);
     }
 

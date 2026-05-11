@@ -14,7 +14,7 @@ public class LoadingStateButton extends Button {
 
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("gui.yes_steve_model.config.loading_state_position"), getX() + 105, getY() + 6, 16777215, false);
+        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("gui.yes_steve_model.config.loading_state_position"), getX() + 105, getY() + 6, -1, false);
     }
 
     public Component getMessage() {

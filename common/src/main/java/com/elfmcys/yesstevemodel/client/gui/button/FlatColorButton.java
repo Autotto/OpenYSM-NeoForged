@@ -50,7 +50,7 @@ public class FlatColorButton extends Button {
             guiGraphics.fillGradient((getX() + this.width) - 1, getY() + 1, getX() + this.width, (getY() + this.height) - 1, -790560, -790560);
             guiGraphics.fillGradient(getX(), (getY() + this.height) - 1, getX() + this.width, getY() + this.height, -790560, -790560);
         }
-        renderScrollingString(guiGraphics, font, 2, 15986656);
+        renderScrollingString(guiGraphics, font, 2, 0xFFF3F0E0);
     }
 
     public void setSelected(boolean selected) {

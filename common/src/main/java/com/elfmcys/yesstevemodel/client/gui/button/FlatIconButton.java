@@ -22,7 +22,7 @@ public class FlatIconButton extends AbstractWidget implements ISpecialWidget {
 
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.fill(getX(), getY(), getX() + getWidth(), getY() + this.iconIndex, -280804798);
-        renderScrollingString(guiGraphics, Minecraft.getInstance().font, 2, 16777215);
+        renderScrollingString(guiGraphics, Minecraft.getInstance().font, 2, -1);
     }
 
     public void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {

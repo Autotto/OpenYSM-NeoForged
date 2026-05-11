@@ -327,7 +327,7 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         }
         this.searchBox = new EditBox(Minecraft.getInstance().font, this.guiLeft + 144, this.guiTop + 6, 140, 16, Component.literal("YSM Search Box"));
         this.searchBox.setValue(value);
-        this.searchBox.setTextColor(15986656);
+        this.searchBox.setTextColor(0xFFF3F0E0);
         this.searchBox.setFocused(zIsFocused);
         this.searchBox.moveCursorToEnd(false);
         addWidget(this.searchBox);
@@ -445,25 +445,28 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         guiGraphics.fillGradient(this.guiLeft, this.guiTop, this.guiLeft + 135, this.guiTop + 235, -14540254, -14540254);
         guiGraphics.fillGradient(this.guiLeft + 138, this.guiTop, this.guiLeft + 420, this.guiTop + 235, -14540254, -14540254);
         guiGraphics.fillGradient(this.guiLeft + 351, this.guiTop + 7, this.guiLeft + 352, this.guiTop + 21, -790560, -790560);
-        this.searchBox.render(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.guiRenderState.nextStratum();
         renderModelPreview(guiGraphics, mouseX, mouseY, this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+        guiGraphics.guiRenderState.nextStratum();
+        this.searchBox.render(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.guiRenderState.nextStratum();
         if (this.searchBox.getValue().isEmpty() && !this.searchBox.isFocused()) {
-            guiGraphics.drawString(this.font, Component.translatable("gui.yes_steve_model.search").withStyle(ChatFormatting.ITALIC), this.guiLeft + 148, this.guiTop + 10, 7829367);
+            guiGraphics.drawString(this.font, Component.translatable("gui.yes_steve_model.search").withStyle(ChatFormatting.ITALIC), this.guiLeft + 148, this.guiTop + 10, 0xFF777777);
         }
         String str = String.format("%d/%d", getCurrentPage() + 1, Integer.valueOf(this.maxPage + 1));
         Font font = this.font;
         int iWidth = this.guiLeft + 138 + ((282 - this.font.width(str)) / 2);
         int pageY = this.guiTop + 223;
         Objects.requireNonNull(this.font);
-        guiGraphics.drawString(font, str, iWidth, pageY - (9 / 2), 15986656);
+        guiGraphics.drawString(font, str, iWidth, pageY - (9 / 2), 0xFFF3F0E0);
         String strVersionString = Platform.getMod(YesSteveModel.MOD_ID).getVersion();
-        guiGraphics.drawString(this.font, strVersionString, this.guiLeft + 2, this.guiTop + 226, ChatFormatting.DARK_GRAY.getColor().intValue());
+        guiGraphics.drawString(this.font, strVersionString, this.guiLeft + 2, this.guiTop + 226, ChatFormatting.DARK_GRAY.getColor().intValue() | 0xFF000000);
         if (StringUtils.isNotBlank(currentPath)) {
             int lineIndex = 0;
             List listSplit = this.font.split(Component.literal("📂 " + currentPath).withStyle(ChatFormatting.GRAY), 270);
             Iterator it = listSplit.iterator();
             while (it.hasNext()) {
-                guiGraphics.drawString(this.font, (FormattedCharSequence) it.next(), this.guiLeft + 142, this.guiTop + (((-(listSplit.size() - lineIndex)) * 10) - 2), 15986656);
+                guiGraphics.drawString(this.font, (FormattedCharSequence) it.next(), this.guiLeft + 142, this.guiTop + (((-(listSplit.size() - lineIndex)) * 10) - 2), 0xFFF3F0E0);
                 lineIndex++;
             }
         }
@@ -522,15 +525,17 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         int iWidth = (this.guiLeft + 414) - this.font.width(mutableComponentLiteral);
         int i = this.guiTop + 215;
         Objects.requireNonNull(this.font);
-        guiGraphics.drawString(this.font, mutableComponentLiteral, iWidth, i + Math.round((14 - 9) / 2.0f), ChatFormatting.DARK_GRAY.getColor().intValue());
+        guiGraphics.drawString(this.font, mutableComponentLiteral, iWidth, i + Math.round((14 - 9) / 2.0f), ChatFormatting.DARK_GRAY.getColor().intValue() | 0xFF000000);
     }
 
     public void renderModelPreview(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         LocalPlayer localPlayer = Minecraft.getInstance().player;
         if (localPlayer != null) {
-            guiGraphics.enableScissor(this.guiLeft + 5, this.guiTop + 29, this.guiLeft + 130, this.guiTop + 200);
+            guiGraphics.guiRenderState.nextStratum();
             InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, this.guiLeft + 5, this.guiTop + 29, this.guiLeft + 130, this.guiTop + 200, 70, 0.0625F, (this.guiLeft + 67) - mouseX, ((this.guiTop + 180) - 95) - mouseY, localPlayer);
-            guiGraphics.disableScissor();
+            guiGraphics.guiRenderState.nextStratum();
+
+//            guiGraphics.disableScissor();
             PlayerCapability.get(localPlayer).ifPresent(cap -> {
                 List<FormattedCharSequence> listSplit = this.font.split(FormattedText.of(ClientModelManager.getModelContext(cap.getModelId()).map(it -> {
                     Metadata metadata2 = it.getModelData().getExtraInfo();
@@ -543,7 +548,7 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
                 }).orElse(FileTypeUtil.getNameWithoutArchiveExtension(cap.getModelId()))), 125);
                 int lineY = this.guiTop + 205;
                 for (FormattedCharSequence formattedCharSequence : listSplit) {
-                    guiGraphics.drawString(this.font, formattedCharSequence, this.guiLeft + ((135 - this.font.width(formattedCharSequence)) / 2), lineY, 15986656);
+                    guiGraphics.drawString(this.font, formattedCharSequence, this.guiLeft + ((135 - this.font.width(formattedCharSequence)) / 2), lineY, 0xFFF3F0E0);
                     lineY += 10;
                 }
             });

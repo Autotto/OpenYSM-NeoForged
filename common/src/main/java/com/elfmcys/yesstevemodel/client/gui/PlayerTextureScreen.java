@@ -232,9 +232,9 @@ public class PlayerTextureScreen extends Screen {
         int iWidth = this.guiLeft + 302 + ((118 - this.font.width(str)) / 2);
         int pageY = this.guiTop + 223;
         Objects.requireNonNull(this.font);
-        guiGraphics.drawString(font, str, iWidth, pageY - (9 / 2), 15986656);
+        guiGraphics.drawString(font, str, iWidth, pageY - (9 / 2), 0xFFF3F0E0);
         String str2 = String.format("%d/%d", this.animationCurrentPage + 1, this.animationMaxPage + 1);
-        guiGraphics.drawString(this.font, str2, this.guiLeft + 5 + ((80 - this.font.width(str2)) / 2), this.guiTop + 218, 15986656);
+        guiGraphics.drawString(this.font, str2, this.guiLeft + 5 + ((80 - this.font.width(str2)) / 2), this.guiTop + 218, 0xFFF3F0E0);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         ((ScreenAccessor) this).ysm$getRenderables().stream().filter(renderable -> {
             return renderable instanceof FlatColorButton;

@@ -2,6 +2,7 @@ package com.elfmcys.yesstevemodel.geckolib3.geo;
 
 import com.elfmcys.yesstevemodel.capability.VehicleCapability;
 import com.elfmcys.yesstevemodel.client.entity.LivingAnimatable;
+import com.elfmcys.yesstevemodel.client.renderer.ModelPreviewRenderer;
 import com.elfmcys.yesstevemodel.geckolib3.extended.LivingEntityRendererAccessor;
 import com.elfmcys.yesstevemodel.geckolib3.core.event.predicate.AnimationEvent;
 import com.elfmcys.yesstevemodel.geckolib3.core.util.Color;
