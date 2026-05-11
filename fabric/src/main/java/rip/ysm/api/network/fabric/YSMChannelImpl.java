@@ -9,7 +9,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -29,13 +29,13 @@ public final class YSMChannelImpl {
     private static final Map<Integer, Codec<?>> CODECS_BY_ID = new HashMap<>();
     private static final Map<Class<?>, Integer> ID_BY_CLASS = new HashMap<>();
 
-    private static ResourceLocation channelId;
+    private static Identifier channelId;
     private static volatile MinecraftServer currentServer;
 
     private YSMChannelImpl() {
     }
 
-    public static void init(ResourceLocation id, String version) {
+    public static void init(Identifier id, String version) {
         channelId = id;
         YSMPayload.init(id);
         PayloadTypeRegistry.playC2S().register(YSMPayload.TYPE, YSMPayload.CODEC);

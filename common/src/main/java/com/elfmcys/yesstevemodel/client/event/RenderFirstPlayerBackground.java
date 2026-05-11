@@ -17,7 +17,7 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import com.mojang.math.Axis;
@@ -62,7 +62,7 @@ public class RenderFirstPlayerBackground {
             if (result.isFalse()) {
                 return;
             }
-            ResourceLocation resourceLocationB_ = cap.getTextureLocation();
+            Identifier resourceLocationB_ = cap.getTextureLocation();
             int textureIndex = cap.getTextureIndex();
             VertexConsumer buffer = multiBufferSource.getBuffer(CustomEntityTranslucentRenderType.get(resourceLocationB_));
             if (instance != null) {

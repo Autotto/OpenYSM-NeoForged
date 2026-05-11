@@ -558,9 +558,10 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         }
     }
 
-    public void resize(Minecraft minecraft, int width, int height) {
+    @Override
+    public void resize(int width, int height) {
         String value = this.searchBox.getValue();
-        super.resize(minecraft, width, height);
+        super.resize(width, height);
         this.searchBox.setValue(value);
     }
 

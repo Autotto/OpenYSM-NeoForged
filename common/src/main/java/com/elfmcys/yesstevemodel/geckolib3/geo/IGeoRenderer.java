@@ -9,8 +9,9 @@ import com.elfmcys.yesstevemodel.geckolib3.util.IRenderCycle;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,15 +52,15 @@ public interface IGeoRenderer<T extends AnimatableEntity<?>> {
     }
 
     @Nullable
-    default RenderType getRenderType(ResourceLocation resourceLocation, boolean z, boolean z2, boolean z3) {
+    default RenderType getRenderType(Identifier identifier, boolean z, boolean z2, boolean z3) {
         if (z) {
             if (z3) {
-                return CustomEntityTranslucentRenderType.get(resourceLocation);
+                return CustomEntityTranslucentRenderType.get(identifier);
             }
-            return RenderType.entityCutoutNoCull(resourceLocation);
+            return RenderTypes.entityCutoutNoCull(identifier);
         }
         if (z2) {
-            return RenderType.outline(resourceLocation);
+            return RenderTypes.outline(identifier);
         }
         return null;
     }

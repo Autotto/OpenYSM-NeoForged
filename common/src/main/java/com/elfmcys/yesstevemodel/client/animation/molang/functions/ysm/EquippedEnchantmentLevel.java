@@ -8,7 +8,7 @@ import com.elfmcys.yesstevemodel.molang.runtime.ExecutionContext;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -28,7 +28,7 @@ public class EquippedEnchantmentLevel extends LivingEntityFunction {
         }
         int enchantmentLevel = 0;
         for (int i = 1; i < arguments.size(); i++) {
-            ResourceLocation id = arguments.getResourceLocation(context, 1);
+            Identifier id = arguments.getResourceLocation(context, 1);
             if (id != null) {
                 Holder<Enchantment> holder = context.entity().entity().level().registryAccess()
                         .lookupOrThrow(Registries.ENCHANTMENT)

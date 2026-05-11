@@ -343,9 +343,9 @@ public class AnimationRouletteScreen extends Screen {
             }
         }) {
             @Override
-            public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+            public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
                 guiGraphics.fill(getX(), getY(), getX() + getWidth(), getY() + getHeight(), -280804798);
-                super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+                super.renderContents(guiGraphics, mouseX, mouseY, partialTick);
             }
         };
         configCheckBox.setStateTriggered(parsedValue > 0.0f);

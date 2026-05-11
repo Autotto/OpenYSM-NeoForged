@@ -6,7 +6,7 @@ import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
@@ -14,7 +14,7 @@ import java.text.DecimalFormat;
 
 public class RangedSliderWidget extends AbstractSliderButton {
 
-    private static final ResourceLocation SLIDER_TEXTURE = ResourceLocation.parse("textures/gui/slider.png");
+    private static final Identifier SLIDER_TEXTURE = Identifier.parse("textures/gui/slider.png");
 
     protected Component prefix;
     protected Component suffix;

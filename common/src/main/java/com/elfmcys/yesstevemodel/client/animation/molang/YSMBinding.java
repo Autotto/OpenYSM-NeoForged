@@ -29,18 +29,18 @@ import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.animal.Parrot;
+import net.minecraft.world.entity.animal.parrot.Parrot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.projectile.arrow.Arrow;
 import net.minecraft.world.entity.projectile.FishingHook;
-import net.minecraft.world.entity.projectile.SpectralArrow;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.arrow.SpectralArrow;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -85,7 +85,7 @@ public class YSMBinding extends ContextBinding {
         var("head_pitch", ctx -> ctx.data().headPitch);
 
         var("weather", ctx -> getWeather(ctx.level()));
-        var("dimension_name", ctx -> ctx.level().dimension().location().toString());
+        var("dimension_name", ctx -> ctx.level().dimension().identifier().toString());
         var("fps", ctx -> Minecraft.getInstance().getFps());
         var("time_delta", ctx -> ctx.geoInstance().getPositionTracker().getTimeDelta() / 20.0f);
         entityVar("ground_speed2", YSMBinding::getGroundSpeed2);
@@ -204,14 +204,14 @@ public class YSMBinding extends ContextBinding {
             if (blockHitResult.getType() == HitResult.Type.MISS || (clientLevel = Minecraft.getInstance().level) == null) {
                 return StringPool.EMPTY;
             }
-            ResourceLocation key = BuiltInRegistries.BLOCK.getKey(clientLevel.getBlockState(blockHitResult.getBlockPos()).getBlock());
+            Identifier key = BuiltInRegistries.BLOCK.getKey(clientLevel.getBlockState(blockHitResult.getBlockPos()).getBlock());
             if (key != null) {
                 return key.toString();
             }
             return StringPool.EMPTY;
         }
         if (hitResult instanceof EntityHitResult) {
-            ResourceLocation key2 = BuiltInRegistries.ENTITY_TYPE.getKey(((EntityHitResult) hitResult).getEntity().getType());
+            Identifier key2 = BuiltInRegistries.ENTITY_TYPE.getKey(((EntityHitResult) hitResult).getEntity().getType());
             if (key2 != null) {
                 return key2.toString();
             }
@@ -235,7 +235,7 @@ public class YSMBinding extends ContextBinding {
     }
 
     private static String getHookedEntityType(IContext<FishingHook> context) {
-        ResourceLocation key;
+        Identifier key;
         Entity entity = ((FishingHookAccessor) context.entity()).getHookedIn();
         if (entity != null && (key = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType())) != null) {
             return key.toString();
@@ -246,7 +246,7 @@ public class YSMBinding extends ContextBinding {
     private static String getThrowableItemId(IContext<ThrowableItemProjectile> context) {
         ThrowableItemProjectile throwableItemProjectile = context.entity();
         if (throwableItemProjectile instanceof ThrowableItemProjectileAccessor) {
-            ResourceLocation key = BuiltInRegistries.ITEM.getKey(((ThrowableItemProjectileAccessor) throwableItemProjectile).invokeGetDefaultItem());
+            Identifier key = BuiltInRegistries.ITEM.getKey(((ThrowableItemProjectileAccessor) throwableItemProjectile).invokeGetDefaultItem());
             if (key != null) {
                 return key.toString();
             }
@@ -317,7 +317,7 @@ public class YSMBinding extends ContextBinding {
         if (livingEntityMo327xaffeef43 instanceof Player) {
             return "player";
         }
-        ResourceLocation key = BuiltInRegistries.ENTITY_TYPE.getKey(livingEntityMo327xaffeef43.getType());
+        Identifier key = BuiltInRegistries.ENTITY_TYPE.getKey(livingEntityMo327xaffeef43.getType());
         if (key == null) {
             return StringPool.EMPTY;
         }
@@ -407,7 +407,7 @@ public class YSMBinding extends ContextBinding {
         }
         Holder<Biome> biome = context.entity().level().getBiome(context.entity().blockPosition());
         biome.unwrapKey().ifPresent(resourceKey -> {
-            context.logWarningComponent(Component.literal("Name ").append(ComponentUtils.copyOnClickText(resourceKey.location().toString())));
+            context.logWarningComponent(Component.literal("Name ").append(ComponentUtils.copyOnClickText(resourceKey.identifier().toString())));
         });
         biome.tags().forEach(tagKey -> {
             context.logWarningComponent(Component.literal("Tag ").append(ComponentUtils.copyOnClickText(tagKey.location().toString())));

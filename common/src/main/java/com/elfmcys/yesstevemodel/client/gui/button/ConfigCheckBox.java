@@ -6,25 +6,28 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.StateSwitchingButton;
-import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 
 import java.util.function.Consumer;
 
 @Environment(EnvType.CLIENT)
-public class ConfigCheckBox extends StateSwitchingButton implements ISpecialWidget {
+public class ConfigCheckBox extends AbstractButton implements ISpecialWidget {
 
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(YesSteveModel.MOD_ID, "texture/roulette.png");
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(YesSteveModel.MOD_ID, "texture/roulette.png");
 
     private final Consumer<Boolean> consumer2;
 
     private final Component component2;
 
+    protected boolean isStateTriggered;
+
     public ConfigCheckBox(int x, int y, int width, Component component, Consumer<Boolean> consumer) {
-        super(x, y, width, 12, false);
+        super(x, y, width, 12, component);
         this.component2 = component;
         this.consumer2 = consumer;
     }
@@ -33,15 +36,29 @@ public class ConfigCheckBox extends StateSwitchingButton implements ISpecialWidg
         this(x, y, 115, component, consumer);
     }
 
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    @Override
+    public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         int v = this.isStateTriggered ? 12 : 0;
         guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, TEXTURE, getX(), getY(), 0, v, this.width, this.height, 128, 24);
         guiGraphics.drawString(Minecraft.getInstance().font, this.component2, getX() + 14, getY() + 2, -1, false);
     }
 
+    public void setStateTriggered(boolean state) {
+        this.isStateTriggered = state;
+    }
+
+    public boolean isStateTriggered() {
+        return this.isStateTriggered;
+    }
+
     @Override
-    public void onClick(MouseButtonEvent event, boolean doubleClick) {
+    public void onPress(InputWithModifiers input) {
         this.isStateTriggered = !this.isStateTriggered;
         this.consumer2.accept(Boolean.valueOf(this.isStateTriggered));
+    }
+
+    @Override
+    protected void updateWidgetNarration(NarrationElementOutput output) {
+        this.defaultButtonNarrationText(output);
     }
 }

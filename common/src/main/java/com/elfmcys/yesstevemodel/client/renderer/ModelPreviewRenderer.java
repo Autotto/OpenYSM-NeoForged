@@ -423,7 +423,6 @@ public final class ModelPreviewRenderer {
         CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
         AvatarRenderState state = new AvatarRenderState();
         renderer.extractRenderState((Player) entity, state, partialTick);
-        state.hitboxesRenderState = null;
 
         // Override the captured rotation. GeoReplacedEntityRenderer#renderEntityWithTexture
         // re-syncs the entity's yaw to these state fields around processAnimation, so
@@ -487,7 +486,6 @@ public final class ModelPreviewRenderer {
         CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
         AvatarRenderState state = new AvatarRenderState();
         renderer.extractRenderState(localPlayer, state, partialTick);
-        state.hitboxesRenderState = null;
         PreviewEntityRegistry.register(state, cap);
 
         // Apply yawOffset on top of the captured natural body rotation so the
@@ -570,7 +568,6 @@ public final class ModelPreviewRenderer {
         CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
         AvatarRenderState state = new AvatarRenderState();
         renderer.extractRenderState((Player) entity, state, partialTick);
-        state.hitboxesRenderState = null;
 
         // Old: yBodyRot = -yaw, yHeadRot = -yaw, yRot = 180 -> state.bodyRot=-yaw,
         // state.yRot=180+yaw (net head). We replicate that so the body rotates with

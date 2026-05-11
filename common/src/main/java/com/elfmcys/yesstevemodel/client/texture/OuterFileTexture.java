@@ -1,6 +1,8 @@
 package com.elfmcys.yesstevemodel.client.texture;
 
 import com.mojang.blaze3d.systems.GpuDevice;
+import com.mojang.blaze3d.textures.AddressMode;
+import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.TextureFormat;
 import rip.ysm.compat.oculus.ShadersTextureType;
 import com.mojang.blaze3d.platform.NativeImage;
@@ -39,10 +41,12 @@ public class OuterFileTexture extends AbstractTexture implements ITextureMap {
             this.texture = gpuDevice.createTexture("OutFileTexture", 5, TextureFormat.RGBA8, loadedImage.getWidth(), loadedImage.getHeight(), 1, 1);
             this.textureView = gpuDevice.createTextureView(this.texture);
             gpuDevice.createCommandEncoder().writeToTexture(this.texture, loadedImage);
-            // setFilter/setClamp require `texture` to be non-null; call after creation.
-            // GL_NEAREST equivalent: linear=false, mipmap=false.
-            this.setFilter(false, false);
-            this.setClamp(false);
+            // GL_NEAREST equivalent + REPEAT addressing (was setFilter(false,false) + setClamp(false) pre-1.21.11).
+            this.sampler = RenderSystem.getSamplerCache().getSampler(
+                AddressMode.REPEAT, AddressMode.REPEAT,
+                FilterMode.NEAREST, FilterMode.NEAREST,
+                false
+            );
         } catch (IOException e) {
             e.printStackTrace();
         }
