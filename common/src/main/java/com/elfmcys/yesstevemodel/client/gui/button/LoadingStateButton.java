@@ -4,6 +4,7 @@ import com.elfmcys.yesstevemodel.config.LoadingStateConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 
 public class LoadingStateButton extends Button {
@@ -21,7 +22,8 @@ public class LoadingStateButton extends Button {
         return Component.literal(LoadingStateConfig.LOADING_STATE_POSITION.get().name());
     }
 
-    public void onPress() {
+    @Override
+    public void onPress(InputWithModifiers input) {
         LoadingStateConfig.Position stateConfig;
         switch (LoadingStateConfig.LOADING_STATE_POSITION.get()) {
             case TOP_LEFT:

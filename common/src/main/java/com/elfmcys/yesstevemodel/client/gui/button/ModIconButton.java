@@ -7,6 +7,7 @@ import com.elfmcys.yesstevemodel.network.NetworkHandler;
 import com.elfmcys.yesstevemodel.network.message.C2SSetStarModelPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -39,7 +40,8 @@ public class ModIconButton extends FlatColorButton {
         }
     }
 
-    public void onPress() {
+    @Override
+    public void onPress(InputWithModifiers input) {
         LocalPlayer localPlayer = Minecraft.getInstance().player;
         if (localPlayer != null) {
             PlayerCapability.get(localPlayer).ifPresent(cap -> {

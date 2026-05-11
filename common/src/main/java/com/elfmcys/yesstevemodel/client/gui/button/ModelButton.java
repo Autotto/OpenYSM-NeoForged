@@ -27,6 +27,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.network.chat.Component;
@@ -131,7 +132,8 @@ public class ModelButton extends Button {
         return super.getMessage();
     }
 
-    public void onPress() {
+    @Override
+    public void onPress(InputWithModifiers input) {
         LocalPlayer localPlayer;
         if (!this.isStarred && (localPlayer = Minecraft.getInstance().player) != null) {
             PlayerCapability.get(localPlayer).ifPresent(cap -> {

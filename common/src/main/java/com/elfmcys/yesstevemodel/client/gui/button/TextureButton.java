@@ -14,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.network.chat.Component;
@@ -35,7 +36,8 @@ public class TextureButton extends Button {
         this.modelAssembly = modelAssembly;
     }
 
-    public void onPress() {
+    @Override
+    public void onPress(InputWithModifiers input) {
         LocalPlayer localPlayer = Minecraft.getInstance().player;
         if (localPlayer != null) {
             PlayerCapability.get(localPlayer).ifPresent(cap -> {

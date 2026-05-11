@@ -12,6 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
@@ -133,7 +134,8 @@ public class AuthorButton extends Button {
         }
     }
 
-    public void onPress() {
+    @Override
+    public void onPress(InputWithModifiers input) {
         String link;
         if (this.authorInfo == null) {
             return;
