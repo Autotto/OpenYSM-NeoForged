@@ -11,6 +11,7 @@
     "client.BufferSourceMixin",
     "client.EntityRenderDispatcherAccessor",
     "client.EntityRenderDispatcherMixin",
+    "client.EntityRendererMixin",
     "client.FishingHookAccessor",
     "client.GuiEntityRendererMixin",
     "client.InventoryScreenMixin",

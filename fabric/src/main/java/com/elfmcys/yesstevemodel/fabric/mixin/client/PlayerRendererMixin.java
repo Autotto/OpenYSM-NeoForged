@@ -1,7 +1,7 @@
 package com.elfmcys.yesstevemodel.fabric.mixin.client;
 
-import com.elfmcys.yesstevemodel.access.IEntityRenderDispatcher;
 import com.elfmcys.yesstevemodel.client.event.ReplacePlayerRenderEvent;
+import com.elfmcys.yesstevemodel.client.renderer.EntityRenderStateBindings;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
@@ -27,12 +27,10 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
 
     @Override
     public void submit(AvatarRenderState livingEntityRenderState, PoseStack poseStack, net.minecraft.client.renderer.SubmitNodeCollector submitNodeCollector, net.minecraft.client.renderer.state.CameraRenderState cameraRenderState) {
-        // Look up the entity that produced this render state during extract. The single-field
-        // "last rendering entity" pattern is unreliable here because LevelRenderer.submitEntities
-        // extracts every entity before submitting any, so the last-set field is always the LAST
-        // extracted entity (often a horse / mob), not the player whose state we're now submitting.
-        Entity entity = ((IEntityRenderDispatcher) Minecraft.getInstance().getEntityRenderDispatcher())
-                .ysm$getEntityForState(livingEntityRenderState);
+        // Recover the entity that produced this render state. EntityRenderStateBindings is
+        // populated at the universal sink EntityRenderer.createRenderState(Entity, float),
+        // so it covers both world rendering AND GUI/PIP previews (inventory, model picker).
+        Entity entity = EntityRenderStateBindings.get(livingEntityRenderState);
         if (entity instanceof Player player) {
             if (ReplacePlayerRenderEvent.onRenderPlayerPre(player, livingEntityRenderState, Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), poseStack, submitNodeCollector, cameraRenderState)) {
                 return;
