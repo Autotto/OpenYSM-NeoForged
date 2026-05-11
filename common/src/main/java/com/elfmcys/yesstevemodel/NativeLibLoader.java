@@ -26,12 +26,12 @@ public final class NativeLibLoader {
     private static ErrorState lastError = null;
 
     private enum TargetPlatform {
-        WINDOWS_X64("windows-x64", "ysm-core.dll", Path.of(System.getProperty("java.io.tmpdir"), "ysm")),
-        WINDOWS_X86("windows-x86", "ysm-core.dll", Path.of(System.getProperty("java.io.tmpdir"), "ysm")),
-        LINUX_X64("linux-x64", "libysm-core.so", Path.of(System.getProperty("user.home"), ".ysm")),
-        MACOS_X64("macos-x64", "libysm-core.dylib", Path.of(System.getProperty("user.home"), ".ysm")),
-        MACOS_ARM64("macos-arm64", "libysm-core.dylib", Path.of(System.getProperty("user.home"), ".ysm")),
-        ANDROID_ARM64("android-arm64", "libysm-core.so", null);
+        WINDOWS_X64("windows-x64", "ysm-core.dll", Path.of(System.getProperty("java.io.tmpdir"), "ysm"));
+//        WINDOWS_X86("windows-x86", "ysm-core.dll", Path.of(System.getProperty("java.io.tmpdir"), "ysm")),
+//        LINUX_X64("linux-x64", "libysm-core.so", Path.of(System.getProperty("user.home"), ".ysm")),
+//        MACOS_X64("macos-x64", "libysm-core.dylib", Path.of(System.getProperty("user.home"), ".ysm")),
+//        MACOS_ARM64("macos-arm64", "libysm-core.dylib", Path.of(System.getProperty("user.home"), ".ysm")),
+//        ANDROID_ARM64("android-arm64", "libysm-core.so", null);
 
         final String resDir;
         final String fileName;
@@ -44,7 +44,7 @@ public final class NativeLibLoader {
         }
 
         String getResourcePath() {
-            return "/META-INF/native/" + resDir + "/" + fileName;
+            return "/natives/" + resDir + "/" + fileName;
         }
     }
 
@@ -70,15 +70,6 @@ public final class NativeLibLoader {
         if (platform == null) return null;
 
         Path storageDir = platform.defaultStorage;
-        if (platform == TargetPlatform.ANDROID_ARM64) {
-            String androidRuntime = System.getenv("MOD_ANDROID_RUNTIME");
-            if (androidRuntime == null) {
-                setUnsupportedLauncherError();
-                return null;
-            }
-            isAndroid = true;
-            storageDir = Path.of(androidRuntime);
-        }
 
         byte[] data = readResource(platform.getResourcePath());
         if (data == null) {
@@ -98,20 +89,17 @@ public final class NativeLibLoader {
         boolean isAarch64 = SystemUtils.OS_ARCH.equals("aarch64");
 
         if (SystemUtils.IS_OS_WINDOWS) {
-            return isX86_64 ? TargetPlatform.WINDOWS_X64 : TargetPlatform.WINDOWS_X86;
+            if (isX86_64) return TargetPlatform.WINDOWS_X64;
+            setUnsupportedPlatformError("Windows x86");
+            return null;
         }
 
         if (SystemUtils.IS_OS_LINUX) {
-            LibcType libc = detectLibcType();
-            if (libc == LibcType.GNU) return isX86_64 ? TargetPlatform.LINUX_X64 : null;
-            if (libc == LibcType.BIONIC) return isAarch64 ? TargetPlatform.ANDROID_ARM64 : null;
             setUnsupportedPlatformError("Linux (Unknown Libc)");
             return null;
         }
 
         if (SystemUtils.IS_OS_MAC) {
-            if (isAarch64) return TargetPlatform.MACOS_ARM64;
-            if (isX86_64) return TargetPlatform.MACOS_X64;
             setUnsupportedPlatformError("macOS (Unsupported Architecture: " + SystemUtils.OS_ARCH + ")");
             return null;
         }
@@ -121,8 +109,14 @@ public final class NativeLibLoader {
     }
 
     private static boolean loadNativeLib(String path) {
+        if(System.getProperty("OYSM_DISABLE_SMID") != null) {
+            return false;
+        }
         try {
+            long start = System.currentTimeMillis();
+            YesSteveModel.LOGGER.info("Begin load native library");
             System.load(path);
+            YesSteveModel.LOGGER.info("Successfully load native library in {}ms", System.currentTimeMillis() - start);
             return true;
         } catch (Throwable th) {
             YesSteveModel.LOGGER.error("Failed to load native lib: " + path, th);

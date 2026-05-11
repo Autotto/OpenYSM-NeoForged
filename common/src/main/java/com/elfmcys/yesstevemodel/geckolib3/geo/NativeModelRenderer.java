@@ -7,19 +7,12 @@ import com.elfmcys.yesstevemodel.client.renderer.ModelPreviewRenderer;
 import com.elfmcys.yesstevemodel.config.GeneralConfig;
 import com.elfmcys.yesstevemodel.geckolib3.geo.render.built.*;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.LightTexture;
 import org.joml.*;
-import org.lwjgl.system.MemoryUtil;
 import rip.ysm.compat.oculus.OculusCompat;
 import rip.ysm.compat.optifine.OptiFineDetector;
-
-import java.lang.Math;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 
 public class NativeModelRenderer {
     private static final Matrix4f projectionModelViewMatrix = new Matrix4f();
@@ -29,13 +22,13 @@ public class NativeModelRenderer {
         boolean isCompatMode = OptiFineDetector.isOptifinePresent() || GeneralConfig.USE_COMPATIBILITY_RENDERER.get();
         net.minecraft.client.Minecraft.getInstance().gameRenderer.getProjectionMatrix(net.minecraft.client.Minecraft.getInstance().options.fov().get()).mul(RenderSystem.getModelViewMatrix(), projectionModelViewMatrix);
         boolean isPreview = ModelPreviewRenderer.isPreview() || ModelPreviewRenderer.isExtraPlayer();
-        if (/*NativeLibLoader.isLoaded()*/false) { // WIP: SIMD MODEL RENDER
+        if (NativeLibLoader.isLoaded() && !GeneralConfig.USE_COMPATIBILITY_RENDERER.get()) { // WIP: SIMD MODEL RENDER
 
             nativeRenderModel(
                     buffer,
                     pose,
                     projectionModelViewMatrix,
-                    isCompatMode,
+                    OptiFineDetector.isOptifinePresent(),
                     model,
                     boneParams,
                     stateBuffer,
@@ -51,7 +44,7 @@ public class NativeModelRenderer {
                     buffer,
                     pose,
                     projectionModelViewMatrix,
-                    isCompatMode,
+                    OptiFineDetector.isOptifinePresent(),
                     model,
                     boneParams,
                     stateBuffer,
@@ -220,12 +213,12 @@ public class NativeModelRenderer {
 
     private static final float[] matrixTransferArray = new float[48];
     @SuppressWarnings("unused") // TODO: native中直接往VertexConsumer中的buffer写入顶点
-    public static void submitVertices(VertexConsumer vertexConsumer, int vertexCount, float[] fArr, int[] iArr) {
+    public static void submitVertices(Object v, int vertexCount, float[] fArr, int[] iArr) {
         int floatIndex = 0;
         int intIndex = 0;
 
         for (int i = 0; i < vertexCount; i++) {
-            vertexConsumer.addVertex(fArr[floatIndex + 0], fArr[floatIndex + 1], fArr[floatIndex + 2])
+            ((VertexConsumer) v).addVertex(fArr[floatIndex + 0], fArr[floatIndex + 1], fArr[floatIndex + 2])
                     .setColor(fArr[floatIndex + 3], fArr[floatIndex + 4], fArr[floatIndex + 5], fArr[floatIndex + 6])
                     .setUv(fArr[floatIndex + 7], fArr[floatIndex + 8])
                     .setOverlay(iArr[intIndex + 0])

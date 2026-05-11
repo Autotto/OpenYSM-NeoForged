@@ -32,7 +32,8 @@ public class AnimationSlider extends RangedSliderWidget implements ISpecialWidge
         this.controllerName = controllerName;
     }
 
-    public void applyValue() {
+    @Override
+    protected void applyValue() {
         try {
             String str = this.controllerName + "=" + getValue();
             this.model.executeExpression(GeckoLibCache.parseSimpleExpression(str), true, false, null);
@@ -44,10 +45,12 @@ public class AnimationSlider extends RangedSliderWidget implements ISpecialWidge
         }
     }
 
+    @Override
     public String getValueString() {
         return DECIMAL_FORMAT.format(getValue());
     }
 
+    @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         Minecraft minecraft = Minecraft.getInstance();
         guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, ROULETTE_TEXTURE, getX(), getY(), 0, 24, this.width - 4, this.height, 256, 256);
