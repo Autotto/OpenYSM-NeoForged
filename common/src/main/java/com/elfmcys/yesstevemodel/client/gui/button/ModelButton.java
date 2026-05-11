@@ -178,7 +178,7 @@ public class ModelButton extends Button {
 
         ModelPreviewRenderer.submitLivingEntityPreview(
                 guiGraphics,
-                x, y, x + this.width, (y + this.height) - 2,
+                x, y, x + this.width, y + 76,
                 30,
                 minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false),
                 this.modelIdHolder,

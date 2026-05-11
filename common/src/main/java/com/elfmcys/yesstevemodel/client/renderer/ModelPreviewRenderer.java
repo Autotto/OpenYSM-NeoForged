@@ -441,7 +441,13 @@ public final class ModelPreviewRenderer {
         }
 
         float entityScale = entity.getScale();
-        Vector3f translation = new Vector3f(0.0F, entity.getBbHeight() / 2.0F, 0.0F);
+        // Match the pre-1.21.6 behaviour: when rotation is disabled the old
+        // renderLivingEntityPreview did a `poseStack.translate(0, 5.5, 0)` AFTER scaling,
+        // i.e. a 5.5-screen-pixel downward shift. Convert that to model-space units so
+        // it stacks onto our PIP translation correctly at any displaySize / entityScale.
+        float yOffsetPx = disablePreviewRotation ? 5.5F : 0.0F;
+        float yOffsetModel = yOffsetPx * entityScale / (float) displaySize;
+        Vector3f translation = new Vector3f(0.0F, entity.getBbHeight() / 2.0F + yOffsetModel, 0.0F);
         float submitScale = (float) displaySize / entityScale;
 
         guiGraphics.enableScissor(x0, y0, x1, y1);
