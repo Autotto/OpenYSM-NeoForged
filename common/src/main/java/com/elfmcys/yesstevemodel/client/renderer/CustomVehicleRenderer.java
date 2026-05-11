@@ -8,6 +8,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.MinecartBehavior;
+import net.minecraft.world.entity.vehicle.OldMinecartBehavior;
 import net.minecraft.world.phys.Vec3;
 import rip.ysm.api.entity.EntityDataBridge;
 
@@ -55,15 +57,15 @@ public class CustomVehicleRenderer {
         double interpX = Mth.lerp(partialTick, minecart.xOld, minecart.getX());
         double interpY = Mth.lerp(partialTick, minecart.yOld, minecart.getY());
         double interpZ = Mth.lerp(partialTick, minecart.zOld, minecart.getZ());
-        // TODO 1.21.4 port: AbstractMinecart.getPos/getPosOffs were removed; using raw position as placeholder
-        Vec3 interpPos = new net.minecraft.world.phys.Vec3(interpX, interpY, interpZ);
+        MinecartBehavior behavior = minecart.getBehavior();
+        Vec3 interpPos = (behavior instanceof OldMinecartBehavior old) ? (old.getPos(interpX, interpY, interpZ)) : new net.minecraft.world.phys.Vec3(interpX, interpY, interpZ);
 
         float calculatedYaw = defaultYaw;
 
         if (interpPos != null) {
-            // TODO 1.21.4 port: AbstractMinecart.getPos/getPosOffs were removed; using raw position as placeholder
-            Vec3 frontOffsetPos = new net.minecraft.world.phys.Vec3(interpX, interpY, interpZ);
-            Vec3 backOffsetPos = new net.minecraft.world.phys.Vec3(interpX, interpY, interpZ);
+            // TODO 1.21.4 port: fix new minecart behavior
+            Vec3 frontOffsetPos = (behavior instanceof OldMinecartBehavior old) ? (old.getPosOffs(interpX, interpY, interpZ, 0.30000001192092896d)) : new net.minecraft.world.phys.Vec3(interpX, interpY, interpZ);
+            Vec3 backOffsetPos = (behavior instanceof OldMinecartBehavior old) ? (old.getPosOffs(interpX, interpY, interpZ, -0.30000001192092896d)) : new net.minecraft.world.phys.Vec3(interpX, interpY, interpZ);
 
             if (frontOffsetPos == null) {
                 frontOffsetPos = interpPos;
