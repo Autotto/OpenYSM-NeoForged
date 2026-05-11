@@ -30,8 +30,6 @@ import com.elfmcys.yesstevemodel.network.message.C2SRequestExecuteMolangPacket;
 import com.elfmcys.yesstevemodel.util.data.OrderedStringMap;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -43,7 +41,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -59,7 +56,6 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 
 
 import java.util.*;
@@ -398,11 +394,6 @@ public class AnimationRouletteScreen extends Screen {
         renderHoverTooltip(guiGraphics, mouseX, scrolledMouseY);
     }
 
-    @Override
-    protected void renderBlurredBackground(GuiGraphics guiGraphics) {
-
-    }
-
     private void renderHoverTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (-1 < this.hoveredIndex && this.hoveredIndex < this.currentProperties.size()) {
             String str = ModelMetadataPresenter.getLocalizedModelString(this.renderContext, "properties.extra_animation.%s.desc".formatted(this.currentProperties.getKeyAt(this.hoveredIndex)), StringPool.EMPTY);
@@ -639,15 +630,6 @@ public class AnimationRouletteScreen extends Screen {
         }
     }
 
-    /**
-     * 1.21.6+ port: the legacy BufferUploader/Tesselator immediate-mode path is gone — there is no
-     * public way to submit arbitrary triangle geometry to the GUI render state without a mixin
-     * accessor. We tessellate each pie slice into K rotated thin rectangles drawn via
-     * {@code guiGraphics.fill}, using {@code pose().rotate()} so each segment lines up along the
-     * radial direction. The intra-slice angular padding (~2°) from the original code is preserved.
-     */
-    private static final int RADIAL_SUB_SEGMENTS = 24;
-
     private void renderRadialBackground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (this.currentProperties.isEmpty()) {
             return;
@@ -705,25 +687,27 @@ public class AnimationRouletteScreen extends Screen {
     }
 
     private void drawRadialSegment(GuiGraphics guiGraphics, float innerRadius, float outerRadius, float startAngle, float endAngle, int color) {
-        // Subdivide the slice angularly into thin sub-segments; each one becomes a rotated
-        // axis-aligned rectangle running radially from innerRadius..outerRadius. Sizing the
-        // tangential half-width by outerRadius (with a tiny safety scale) over-covers the inner
-        // edge so adjacent sub-segments overlap there, eliminating visible radial gaps.
-        org.joml.Matrix3x2fStack pose = guiGraphics.pose();
-        float dA = (endAngle - startAngle) / (float) RADIAL_SUB_SEGMENTS;
-        float halfWidth = outerRadius * (float) Math.sin(dA / 2.0) * 1.05f;
-        int yLow = -(int) Math.ceil(halfWidth);
-        int yHigh = (int) Math.ceil(halfWidth);
-        int xLow = Math.round(innerRadius);
-        int xHigh = Math.round(outerRadius);
-        for (int k = 0; k < RADIAL_SUB_SEGMENTS; k++) {
-            float midA = startAngle + (k + 0.5f) * dA;
-            pose.pushMatrix();
-            pose.translate(this.centerX, this.centerY);
-            pose.rotate(midA);
-            guiGraphics.fill(xLow, yLow, xHigh, yHigh, color);
-            pose.popMatrix();
-        }
+        float startCos = Mth.cos(startAngle);
+        float startSin = Mth.sin(startAngle);
+        float endCos = Mth.cos(endAngle);
+        float endSin = Mth.sin(endAngle);
+        float outerStartX = this.centerX + outerRadius * startCos;
+        float outerStartY = this.centerY + outerRadius * startSin;
+        float innerStartX = this.centerX + innerRadius * startCos;
+        float innerStartY = this.centerY + innerRadius * startSin;
+        float innerEndX = this.centerX + innerRadius * endCos;
+        float innerEndY = this.centerY + innerRadius * endSin;
+        float outerEndX = this.centerX + outerRadius * endCos;
+        float outerEndY = this.centerY + outerRadius * endSin;
+        guiGraphics.guiRenderState.submitGuiElement(RadialSliceRenderState.of(
+                guiGraphics.pose(),
+                outerStartX, outerStartY,
+                innerStartX, innerStartY,
+                innerEndX, innerEndY,
+                outerEndX, outerEndY,
+                color,
+                null
+        ));
     }
 
 }
