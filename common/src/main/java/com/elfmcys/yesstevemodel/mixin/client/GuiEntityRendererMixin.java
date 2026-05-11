@@ -66,11 +66,20 @@ public class GuiEntityRendererMixin {
             MultiBufferSource bufferSource,
             int packedLight
     ) {
-        CustomPlayerEntity animatable = PreviewEntityRegistry.get(state);
-        if (animatable != null && state instanceof PlayerRenderState playerState) {
+        PreviewEntityRegistry.Entry entry = PreviewEntityRegistry.getEntry(state);
+        if (entry != null && entry.animatable() != null && state instanceof PlayerRenderState playerState) {
             try {
+                // Scenery (ground / bed / vehicle) is rendered first so the player
+                // overlays it with the correct depth ordering, matching the pre-1.21.6
+                // call order in renderEntityPreview.
+                if (entry.beforeEntity() != null) {
+                    entry.beforeEntity().render(poseStack, bufferSource, packedLight);
+                }
                 CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
-                renderer.renderEntity(animatable, playerState, 0.0f, 1.0f, poseStack, bufferSource, packedLight);
+                renderer.renderEntity(entry.animatable(), playerState, 0.0f, 1.0f, poseStack, bufferSource, packedLight);
+                if (entry.afterEntity() != null) {
+                    entry.afterEntity().render(poseStack, bufferSource, packedLight);
+                }
             } finally {
                 PreviewEntityRegistry.remove(state);
             }

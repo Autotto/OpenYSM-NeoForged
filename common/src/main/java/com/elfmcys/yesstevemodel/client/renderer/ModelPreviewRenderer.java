@@ -506,4 +506,193 @@ public final class ModelPreviewRenderer {
 
         guiGraphics.submitEntityRenderState(state, submitScale, translation, rotation, null, x0, y0, x1, y1);
     }
+
+    /**
+     * Animation test preview (PlayerTextureScreen). Renders a player model with
+     * user-controlled yaw / pitch / zoom / offset inside the supplied scissor rect.
+     * Replaces the pre-1.21.6 {@link #renderEntityPreview} which relied on
+     * {@code RenderSystem.getModelViewStack} + {@code bufferSource.endBatch} and
+     * cannot work under 1.21.8's deferred GUI pipeline.
+     *
+     * @param x0,y0,x1,y1 PIP rect (also used as scissor)
+     * @param anchorX,anchorY screen-pixel position the model anchor maps to
+     *                        (before the OLD-compatible +0.8 base offset)
+     * @param zoom model display scale (pixels per model unit at entityScale=1)
+     * @param pitch user X tilt in degrees (added on top of -10° base)
+     * @param yaw user Y body yaw in degrees
+     */
+    public static void submitTexturePreview(
+            GuiGraphics guiGraphics,
+            int x0, int y0, int x1, int y1,
+            float anchorX, float anchorY,
+            float zoom,
+            float pitch,
+            float yaw,
+            PlayerPreviewEntity animatable,
+            boolean renderGround,
+            float partialTick
+    ) {
+        LivingEntity entity = animatable.getEntity();
+        if (entity == null) {
+            return;
+        }
+
+        // Animation-driven pose overrides matching the pre-1.21.6 renderEntityPreview.
+        // For sleep / swim / sneak we set Pose so HumanoidModel#setupAnim picks up
+        // the right limb layout; for sit / ride / ride_pig / boat we apply a small
+        // Y offset (in model units) that the old code added via poseStack.translate.
+        AnimationTracker tracker = animatable.getAnimationStateMachine();
+        Pose oldPose = entity.getPose();
+        Pose newPose = oldPose;
+        float poseYOffset = 0.0F;
+        if (tracker.isCurrentAnimation("sleep")) {
+            newPose = Pose.SLEEPING;
+        } else if (tracker.isCurrentAnimation("swim") || tracker.isCurrentAnimation("swim_stand")) {
+            newPose = Pose.SWIMMING;
+        } else if (tracker.isCurrentAnimation("sneak") || tracker.isCurrentAnimation("sneaking")) {
+            newPose = Pose.CROUCHING;
+        } else if (tracker.isCurrentAnimation("sit")) {
+            poseYOffset = -0.5F;
+        } else if (tracker.isCurrentAnimation("ride")) {
+            poseYOffset = 0.85F;
+        } else if (tracker.isCurrentAnimation("ride_pig")) {
+            poseYOffset = 0.3125F;
+        } else if (tracker.isCurrentAnimation("boat")) {
+            poseYOffset = -0.45F;
+        }
+        boolean poseChanged = newPose != oldPose;
+        if (poseChanged) {
+            entity.setPose(newPose);
+        }
+
+        CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
+        PlayerRenderState state = new PlayerRenderState();
+        renderer.extractRenderState((Player) entity, state, partialTick);
+        state.hitboxesRenderState = null;
+
+        // Old: yBodyRot = -yaw, yHeadRot = -yaw, yRot = 180 -> state.bodyRot=-yaw,
+        // state.yRot=180+yaw (net head). We replicate that so the body rotates with
+        // the user-controlled yaw and the head stays aligned with the body.
+        state.bodyRot = -yaw;
+        state.yRot = Mth.wrapDegrees(180.0F + yaw);
+        state.xRot = 0.0F;
+
+        // Scenery (ground / bed / vehicle). These piggy-back on the PIP PoseStack and
+        // BufferSource via PreviewEntityRegistry, so they end up in the same off-screen
+        // texture as the player with correct depth ordering.
+        final float capturedYaw = yaw;
+        final boolean wantGround = renderGround;
+        final boolean wantBed = tracker.isCurrentAnimation("sleep");
+        final boolean wantHorse = tracker.isCurrentAnimation("ride");
+        final boolean wantPig = tracker.isCurrentAnimation("ride_pig");
+        final boolean wantBoat = tracker.isCurrentAnimation("boat");
+        PreviewEntityRegistry.SceneryRenderer scenery = null;
+        if (wantGround || wantBed || wantHorse || wantPig || wantBoat) {
+            scenery = (poseStack, bufferSource, packedLight) -> {
+                if (wantHorse) {
+                    renderVehicleScenery(poseStack, bufferSource, packedLight, capturedYaw, partialTick, entity, EntityType.HORSE);
+                } else if (wantPig) {
+                    renderVehicleScenery(poseStack, bufferSource, packedLight, capturedYaw, partialTick, entity, EntityType.PIG);
+                } else if (wantBoat) {
+                    renderVehicleScenery(poseStack, bufferSource, packedLight, capturedYaw, partialTick, entity, EntityType.OAK_BOAT);
+                }
+                if (wantBed) {
+                    renderBedScenery(poseStack, bufferSource, packedLight, capturedYaw);
+                }
+                if (wantGround) {
+                    renderGroundScenery(poseStack, bufferSource, packedLight, capturedYaw);
+                }
+            };
+        }
+
+        if (scenery != null) {
+            PreviewEntityRegistry.register(state, animatable, scenery, null);
+        } else {
+            PreviewEntityRegistry.register(state, animatable);
+        }
+
+        Quaternionf cameraTilt = new Quaternionf().rotateX((float) Math.toRadians(-10.0 + pitch));
+        Quaternionf rotation = new Quaternionf().rotateZ((float) Math.PI).mul(cameraTilt);
+
+        float entityScale = entity.getScale();
+        float submitScale = zoom / entityScale;
+        float rectCenterX = (x0 + x1) / 2.0F;
+        float rectCenterY = (y0 + y1) / 2.0F;
+        // (anchorX,anchorY) is the OLD-style screen anchor; translate(0,0.8,0)
+        // in OLD pose-space is the constant base offset that puts the model
+        // slightly below the anchor.
+        float translationX = (anchorX - rectCenterX) / submitScale;
+        float translationY = (anchorY - rectCenterY) / submitScale + 0.8F + poseYOffset;
+
+        if (wantBed) {
+            state.bodyRot = yaw - 90;
+        }
+
+        Vector3f translation = new Vector3f(translationX, translationY, 0.0F);
+
+        guiGraphics.enableScissor(x0, y0, x1, y1);
+        guiGraphics.submitEntityRenderState(state, submitScale, translation, rotation, cameraTilt, x0, y0, x1, y1);
+        guiGraphics.disableScissor();
+
+        if (poseChanged) {
+            entity.setPose(oldPose);
+        }
+    }
+
+    private static void renderGroundScenery(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, float yaw) {
+        net.minecraft.client.renderer.block.BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
+        poseStack.translate(-1.5d, -1.0d, -2.5d);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                poseStack.translate(0.0f, 0.0f, 1.0f);
+                blockRenderer.renderSingleBlock(Blocks.GRASS_BLOCK.defaultBlockState(), poseStack, bufferSource, packedLight, OverlayTexture.NO_OVERLAY);
+            }
+            poseStack.translate(1.0f, 0.0f, -3.0f);
+        }
+        poseStack.translate(-1.0f, 1.0f, 1.0f);
+        blockRenderer.renderSingleBlock(Blocks.SHORT_GRASS.defaultBlockState(), poseStack, bufferSource, packedLight, OverlayTexture.NO_OVERLAY);
+        poseStack.translate(0.0f, 0.0f, 1.0f);
+        blockRenderer.renderSingleBlock(Blocks.RED_TULIP.defaultBlockState(), poseStack, bufferSource, packedLight, OverlayTexture.NO_OVERLAY);
+        poseStack.popPose();
+    }
+
+    private static void renderBedScenery(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, float yaw) {
+        net.minecraft.client.renderer.block.BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.YP.rotationDegrees(yaw + 180.0f));
+        poseStack.translate(-0.5d, 0.0d, 0.5d);
+        blockRenderer.renderSingleBlock(Blocks.RED_BED.defaultBlockState(), poseStack, bufferSource, packedLight, OverlayTexture.NO_OVERLAY);
+        poseStack.popPose();
+    }
+
+    private static void renderVehicleScenery(
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight,
+            float yaw,
+            float partialTick,
+            LivingEntity rider,
+            EntityType<? extends Entity> vehicleType
+    ) {
+        if (rider.level() == null) {
+            return;
+        }
+        Entity vehicle;
+        try {
+            vehicle = AnimatableCacheUtil.ENTITIES_CACHE.get(EntityType.getKey(vehicleType), () -> vehicleType.create(rider.level(), EntitySpawnReason.LOAD));
+        } catch (java.util.concurrent.ExecutionException e) {
+            return;
+        }
+        if (vehicle == null) {
+            return;
+        }
+        EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
+        double yOffset = -(vehicle.getPassengerRidingPosition(rider).y - vehicle.getY());
+        dispatcher.render(vehicle, 0.0d, yOffset, 0.0d, partialTick, poseStack, bufferSource, packedLight);
+        poseStack.popPose();
+    }
 }

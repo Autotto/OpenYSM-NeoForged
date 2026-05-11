@@ -218,15 +218,10 @@ public class PlayerTextureScreen extends Screen {
         guiGraphics.fillGradient(this.guiLeft, this.guiTop + 22, this.guiLeft + 90, this.guiTop + 235, -14540254, -14540254);
         guiGraphics.fillGradient(this.guiLeft + 93, this.guiTop, this.guiLeft + 299, this.guiTop + 235, -14540254, -14540254);
         guiGraphics.fillGradient(this.guiLeft + 302, this.guiTop, this.guiLeft + 420, this.guiTop + 235, -14540254, -14540254);
-        double guiScale = Minecraft.getInstance().getWindow().getGuiScale();
-        int scissorX = (int) ((this.guiLeft + 93) * guiScale);
-        int height = (int) (Minecraft.getInstance().getWindow().getHeight() - ((this.guiTop + 235) * guiScale));
-        int scissorWidth = (int) (206.0d * guiScale);
-        int scissorHeight = (int) (235.0d * guiScale);
         if (!this.modelHolder.getAnimationStateMachine().isCurrentAnimation(this.currentAnimation)) {
             this.modelHolder.getAnimationStateMachine().setCurrentAnimation(this.currentAnimation);
         }
-        renderTexturePreview(guiGraphics, scissorX, height, scissorWidth, scissorHeight, this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+        renderTexturePreview(guiGraphics, this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false));
         String str = String.format("%d/%d", this.textureCurrentPage + 1, this.textureMaxPage + 1);
         Font font = this.font;
         int iWidth = this.guiLeft + 302 + ((118 - this.font.width(str)) / 2);
@@ -248,16 +243,30 @@ public class PlayerTextureScreen extends Screen {
 
     }
 
-    public void renderTexturePreview(GuiGraphics guiGraphics, int scissorX, int scissorY, int scissorWidth, int scissorHeight, float partialTick) {
-        guiGraphics.enableScissor(scissorX, scissorY, scissorX + scissorWidth, scissorY + scissorHeight);
+    public void renderTexturePreview(GuiGraphics guiGraphics, float partialTick) {
         PlayerCapability.get(this.minecraft.player).ifPresent(cap -> {
             this.modelHolder.initModelWithTexture(this.modelId, cap.getCurrentTextureName());
-            CustomPlayerRenderer playerRenderer = RendererManager.getPlayerRenderer();
-            PlayerRenderState state = new PlayerRenderState();
-            playerRenderer.extractRenderState(this.modelHolder.entity, state, partialTick);
-            ModelPreviewRenderer.renderEntityPreview(this.guiLeft + 149.5f + 40.0f + this.offsetX, this.guiTop + 117.5f + 80.0f + this.offsetY, this.zoom, this.pitch, this.yaw, partialTick, this.modelHolder, state, playerRenderer, this.showGround);
+            // Scissor / PIP rect is the central preview panel (93..299 horizontally,
+            // full GUI height vertically). submitTexturePreview enables its own
+            // scissor for the same rect.
+            int x0 = this.guiLeft + 93;
+            int y0 = this.guiTop;
+            int x1 = this.guiLeft + 299;
+            int y1 = this.guiTop + 235;
+            float anchorX = this.guiLeft + 149.5f + 40.0f + this.offsetX;
+            float anchorY = this.guiTop + 117.5f + 80.0f + this.offsetY;
+            ModelPreviewRenderer.submitTexturePreview(
+                    guiGraphics,
+                    x0, y0, x1, y1,
+                    anchorX, anchorY,
+                    this.zoom,
+                    this.pitch,
+                    this.yaw,
+                    this.modelHolder,
+                    this.showGround,
+                    partialTick
+            );
         });
-        guiGraphics.disableScissor();
     }
 
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
