@@ -50,8 +50,11 @@ public class AnimationSlider extends RangedSliderWidget implements ISpecialWidge
 
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         Minecraft minecraft = Minecraft.getInstance();
-        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, ROULETTE_TEXTURE, getX(), getY(), 0, textureBaseY() + 24, this.width, this.height, 200, 15);
-        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, ROULETTE_TEXTURE, getX() + ((int) (this.value * (this.width - 8))), getY(), 0, handleTextureBaseY() + 24, 8, this.height, 200, 15);
+        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, ROULETTE_TEXTURE, getX(), getY(), 0, 24, this.width - 4, this.height, 256, 256);
+        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, ROULETTE_TEXTURE, getX() + this.width - 4, getY(), 196, 24, 4, this.height, 256, 256);
+
+        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, ROULETTE_TEXTURE, getX() + ((int) (this.value * (this.width - 8))), getY(), 0, isHovered() ? 84 : 64, 4, this.height, 256, 256);
+        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, ROULETTE_TEXTURE, getX() + ((int) (this.value * (this.width - 8))) + 4, getY(), 196, isHovered() ? 84 : 64, 4, this.height, 256, 256);
         int color = 16777215 | (Mth.ceil(this.alpha * 255.0f) << 24);
         guiGraphics.drawCenteredString(minecraft.font, this.getMessage(), getX() + this.width / 2, getY() + (this.height - 8) / 2, color);
     }

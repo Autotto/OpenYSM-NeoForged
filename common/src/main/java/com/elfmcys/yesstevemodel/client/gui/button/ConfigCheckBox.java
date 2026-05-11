@@ -38,8 +38,9 @@ public class ConfigCheckBox extends AbstractButton implements ISpecialWidget {
 
     @Override
     public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        int v = this.isStateTriggered ? 12 : 0;
-        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, TEXTURE, getX(), getY(), 0, v, this.width, this.height, 128, 24);
+        int u = isStateTriggered ? 128 : 0;
+        int v = isHovered() ? 12 : 0;
+        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, TEXTURE, getX(), getY(), u, v, this.width, this.height, 256, 256);
         guiGraphics.drawString(Minecraft.getInstance().font, this.component2, getX() + 14, getY() + 2, -1, false);
     }
 
