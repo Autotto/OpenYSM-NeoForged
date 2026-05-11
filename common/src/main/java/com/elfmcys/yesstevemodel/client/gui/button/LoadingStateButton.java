@@ -4,10 +4,12 @@ import com.elfmcys.yesstevemodel.config.LoadingStateConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.PlainTextButton;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
+import org.jspecify.annotations.NonNull;
 
-public class LoadingStateButton extends Button {
+public class LoadingStateButton extends Button.Plain {
     public LoadingStateButton(int x, int y) {
         super(x, y, 100, 20, Component.empty(), button -> {
         }, DEFAULT_NARRATION);
@@ -15,11 +17,11 @@ public class LoadingStateButton extends Button {
 
     @Override
     public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        renderDefaultSprite(guiGraphics);
+        super.renderContents(guiGraphics, mouseX, mouseY, partialTick);
         guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("gui.yes_steve_model.config.loading_state_position"), getX() + 105, getY() + 6, -1, false);
     }
 
-    public Component getMessage() {
+    public @NonNull Component getMessage() {
         return Component.literal(LoadingStateConfig.LOADING_STATE_POSITION.get().name());
     }
 
@@ -49,5 +51,6 @@ public class LoadingStateButton extends Button {
                 throw new IncompatibleClassChangeError();
         }
         LoadingStateConfig.LOADING_STATE_POSITION.set(stateConfig);
+
     }
 }

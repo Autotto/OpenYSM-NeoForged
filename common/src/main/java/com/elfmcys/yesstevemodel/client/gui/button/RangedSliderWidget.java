@@ -14,7 +14,10 @@ import java.text.DecimalFormat;
 
 public class RangedSliderWidget extends AbstractSliderButton {
 
-    private static final Identifier SLIDER_TEXTURE = Identifier.parse("textures/gui/slider.png");
+    private static final Identifier SLIDER_TEXTURE = Identifier.parse("textures/gui/sprites/widget/slider.png");
+    private static final Identifier SLIDER_HIGHLIGHTED_TEXTURE = Identifier.parse("textures/gui/sprites/widget/slider_highlighted.png");
+    private static final Identifier SLIDER_HANDLE_TEXTURE = Identifier.parse("textures/gui/sprites/widget/slider_handle.png");
+    private static final Identifier SLIDER_HANDLE_HIGHLIGHTED_TEXTURE = Identifier.parse("textures/gui/sprites/widget/slider_handle_highlighted.png");
 
     protected Component prefix;
     protected Component suffix;
@@ -148,8 +151,8 @@ public class RangedSliderWidget extends AbstractSliderButton {
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         Minecraft mc = Minecraft.getInstance();
-        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, SLIDER_TEXTURE, this.getX(), this.getY(), 0, textureBaseY(), this.width, this.height, 200, 20);
-        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, SLIDER_TEXTURE, this.getX() + (int) (this.value * (double) (this.width - 8)), this.getY(), 0, handleTextureBaseY(), 8, this.height, 200, 20);
+        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, SLIDER_TEXTURE, this.getX(), this.getY(), 0, 0, this.width, this.height, 200, this.height);
+        guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, isHovered() ? SLIDER_HANDLE_HIGHLIGHTED_TEXTURE : SLIDER_HANDLE_TEXTURE, this.getX() + (int) (this.value * (double) (this.width - 8)), this.getY(), 0, 0, 8, this.height, 8, this.height);
         int color = 16777215 | Mth.ceil(this.alpha * 255.0F) << 24;
         guiGraphics.drawCenteredString(mc.font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, color);
     }

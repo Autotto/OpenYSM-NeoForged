@@ -29,7 +29,7 @@ public class ExtraPlayerConfigScreen extends Screen {
         addRenderableWidget(new FlatColorButton(guiLeft + 5, guiTop + 2, 80, 18, Component.translatable("gui.yes_steve_model.model.return"), button -> {
             Minecraft.getInstance().setScreen(this.parentScreen);
         }));
-        addRenderableWidget(new RangedSliderWidget(guiLeft + 5, guiTop + 24, 320, 18, Component.translatable("gui.yes_steve_model.config.sound_volume"), Component.literal("%"), 0.0d, 100.0d, GeneralConfig.SOUND_VOLUME.get().doubleValue(), 1D, 0, true) {
+        addRenderableWidget(new RangedSliderWidget(guiLeft + 5, guiTop + 24, 200, 18, Component.translatable("gui.yes_steve_model.config.sound_volume"), Component.literal("%"), 0.0d, 100.0d, GeneralConfig.SOUND_VOLUME.get().doubleValue(), 1D, 0, true) {
             @Override
             protected void applyValue() {
                 GeneralConfig.SOUND_VOLUME.set(Double.valueOf(getValue()));
