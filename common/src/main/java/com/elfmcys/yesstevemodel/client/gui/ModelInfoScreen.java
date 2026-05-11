@@ -158,6 +158,11 @@ public class ModelInfoScreen extends Screen {
         });
     }
 
+    @Override
+    protected void renderBlurredBackground() {
+
+    }
+
     public boolean isPauseScreen() {
         return false;
     }

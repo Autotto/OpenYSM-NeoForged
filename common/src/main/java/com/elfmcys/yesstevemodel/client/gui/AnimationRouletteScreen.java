@@ -396,6 +396,11 @@ public class AnimationRouletteScreen extends Screen {
         renderHoverTooltip(guiGraphics, mouseX, scrolledMouseY);
     }
 
+    @Override
+    protected void renderBlurredBackground() {
+
+    }
+
     private void renderHoverTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (-1 < this.hoveredIndex && this.hoveredIndex < this.currentProperties.size()) {
             String str = ModelMetadataPresenter.getLocalizedModelString(this.renderContext, "properties.extra_animation.%s.desc".formatted(this.currentProperties.getKeyAt(this.hoveredIndex)), StringPool.EMPTY);

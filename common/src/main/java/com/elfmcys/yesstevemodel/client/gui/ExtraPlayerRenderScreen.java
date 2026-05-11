@@ -98,6 +98,11 @@ public class ExtraPlayerRenderScreen extends Screen {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
+    @Override
+    protected void renderBlurredBackground() {
+
+    }
+
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         boolean inLeftHandleX = ((double) (this.mouseStartX - this.offsetX)) < mouseX && mouseX < ((double) (this.mouseStartX + this.offsetX));
         boolean inLeftHandleY = ((double) (this.mouseStartY - this.offsetX)) < mouseY && mouseY < ((double) (this.mouseStartY + this.offsetX));

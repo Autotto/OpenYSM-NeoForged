@@ -243,6 +243,11 @@ public class PlayerTextureScreen extends Screen {
         });
     }
 
+    @Override
+    protected void renderBlurredBackground() {
+
+    }
+
     public void renderTexturePreview(GuiGraphics guiGraphics, int scissorX, int scissorY, int scissorWidth, int scissorHeight, float partialTick) {
         RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
         PlayerCapability.get(this.minecraft.player).ifPresent(cap -> {

@@ -496,6 +496,11 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         }
     }
 
+    @Override
+    protected void renderBlurredBackground() {
+
+    }
+
     private void renderSyncStatus(GuiGraphics guiGraphics) {
         MutableComponent mutableComponentLiteral;
         ClientModelManager.SyncStatus currentState = ClientModelManager.getSyncStatus();
