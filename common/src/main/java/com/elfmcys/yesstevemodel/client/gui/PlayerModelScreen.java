@@ -535,7 +535,7 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         LocalPlayer localPlayer = Minecraft.getInstance().player;
         if (localPlayer != null) {
             guiGraphics.guiRenderState.nextStratum();
-            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, this.guiLeft + 5, this.guiTop + 29, this.guiLeft + 130, this.guiTop + 200, 70, 0.0625F, (this.guiLeft + 67) - mouseX, ((this.guiTop + 180) - 95) - mouseY, localPlayer);
+            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, this.guiLeft + 5, this.guiTop + 29, this.guiLeft + 130, this.guiTop + 200, 70, 0.0625F, mouseX, mouseY, localPlayer);
             guiGraphics.guiRenderState.nextStratum();
 
 //            guiGraphics.disableScissor();
