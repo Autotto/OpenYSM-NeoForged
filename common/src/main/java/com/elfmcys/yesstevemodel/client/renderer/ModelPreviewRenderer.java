@@ -32,10 +32,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import com.mojang.math.Axis;
+import com.elfmcys.yesstevemodel.client.entity.CustomPlayerEntity;
+import com.elfmcys.yesstevemodel.client.entity.PlayerPreviewEntity;
 
 public final class ModelPreviewRenderer {
 
@@ -376,5 +379,125 @@ public final class ModelPreviewRenderer {
         entityRenderDispatcher.setRenderShadow(true);
         modelViewStack.popMatrix();
         setExtraPlayerMode(false);
+    }
+
+    // ------------------------------------------------------------------
+    // 1.21.8 PIP-aware submit API
+    //
+    // 1.21.4-era helpers above modify RenderSystem.getModelViewStack and
+    // call bufferSource.endBatch() during the Screen.render phase. In 1.21.8
+    // GUI rendering is deferred (GuiRenderState/GuiRenderer/PIP), so those
+    // immediate-mode calls land with the wrong projection / corrupt later
+    // deferred draws. The submitX methods below build a PlayerRenderState,
+    // record an animatable in PreviewEntityRegistry so GuiEntityRendererMixin
+    // can dispatch to CustomPlayerRenderer.renderEntity directly, and rely
+    // on the PIP renderer for FBO/projection/lighting setup.
+    // ------------------------------------------------------------------
+
+    public static void submitLivingEntityPreview(
+            GuiGraphics guiGraphics,
+            int x0, int y0, int x1, int y1,
+            int displaySize,
+            float partialTick,
+            PlayerPreviewEntity animatable,
+            boolean disablePreviewRotation,
+            boolean hideEquipment
+    ) {
+        LivingEntity entity = animatable.getEntity();
+        if (entity == null) {
+            return;
+        }
+
+        ItemStack[] savedEquipment = null;
+        if (hideEquipment && entity instanceof Player player) {
+            EquipmentSlot[] slots = EquipmentSlot.values();
+            savedEquipment = new ItemStack[slots.length];
+            for (int i = 0; i < slots.length; i++) {
+                savedEquipment[i] = player.getItemBySlot(slots[i]).copy();
+                player.setItemSlot(slots[i], ItemStack.EMPTY);
+            }
+        }
+
+        CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
+        PlayerRenderState state = new PlayerRenderState();
+        renderer.extractRenderState((Player) entity, state, partialTick);
+        state.hitboxesRenderState = null;
+
+        // Override the captured rotation. GeoReplacedEntityRenderer#renderEntityWithTexture
+        // re-syncs the entity's yaw to these state fields around processAnimation, so
+        // the doll's yaw is decoupled from whatever the underlying entity is doing.
+        float previewYaw = disablePreviewRotation ? 180.0F : 200.0F;
+        state.bodyRot = previewYaw;
+        state.yRot = 0.0F;
+        state.xRot = 0.0F;
+
+        PreviewEntityRegistry.register(state, animatable);
+
+        Quaternionf rotation = new Quaternionf().rotateZ((float) Math.PI);
+        Quaternionf cameraTilt = null;
+        if (!disablePreviewRotation) {
+            cameraTilt = new Quaternionf().rotateX((float) (-10.0 * Math.PI / 180.0));
+            rotation.mul(cameraTilt);
+        }
+
+        float entityScale = entity.getScale();
+        Vector3f translation = new Vector3f(0.0F, entity.getBbHeight() / 2.0F, 0.0F);
+        float submitScale = (float) displaySize / entityScale;
+
+        guiGraphics.enableScissor(x0, y0, x1, y1);
+        guiGraphics.submitEntityRenderState(state, submitScale, translation, rotation, cameraTilt, x0, y0, x1, y1);
+        guiGraphics.disableScissor();
+
+        if (savedEquipment != null) {
+            Player player = (Player) entity;
+            EquipmentSlot[] slots = EquipmentSlot.values();
+            for (int i = 0; i < slots.length; i++) {
+                player.setItemSlot(slots[i], savedEquipment[i]);
+            }
+        }
+    }
+
+    public static void submitPlayerOverlay(
+            GuiGraphics guiGraphics,
+            LocalPlayer localPlayer,
+            double x, double y,
+            float scale,
+            float yawOffset,
+            float partialTick
+    ) {
+        PlayerCapability cap = PlayerCapability.get(localPlayer).orElse(null);
+        if (cap == null) {
+            return;
+        }
+        cap.tickModel();
+
+        int x0 = (int) x;
+        int y0 = (int) y;
+        int x1 = (int) (x + scale * 1.2F);
+        int y1 = (int) (y + scale * 2.0F);
+
+        CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
+        PlayerRenderState state = new PlayerRenderState();
+        renderer.extractRenderState(localPlayer, state, partialTick);
+        state.hitboxesRenderState = null;
+        PreviewEntityRegistry.register(state, cap);
+
+        // Apply yawOffset on top of the captured natural body rotation so the
+        // doll faces a user-configurable direction without mutating the actual
+        // player entity. state.yRot is the *net* head yaw (head - body), so
+        // leave it alone to preserve natural head turning when the player looks
+        // around. GeoReplacedEntityRenderer#renderEntityWithTexture syncs the
+        // entity to these values at render time so processAnimation sees them.
+//        state.bodyRot = state.bodyRot + yawOffset;
+        state.bodyRot = 180.0F;
+//        state.yRot = 0.0F;
+//        state.xRot = 0.0F;
+
+        Quaternionf rotation = new Quaternionf().rotateZ((float) Math.PI);
+        float entityScale = localPlayer.getScale();
+        Vector3f translation = new Vector3f(0.0F, localPlayer.getBbHeight() / 2.0F, 0.0F);
+        float submitScale = scale / entityScale;
+
+        guiGraphics.submitEntityRenderState(state, submitScale, translation, rotation, null, x0, y0, x1, y1);
     }
 }

@@ -90,7 +90,7 @@ public class ExtraPlayerRenderScreen extends Screen {
             tipY += 10;
         }
         if (Minecraft.getInstance().player != null && !ExtraPlayerRenderConfig.DISABLE_PLAYER_RENDER.get().booleanValue()) {
-            ModelPreviewRenderer.renderPlayerOverlay(guiGraphics, Minecraft.getInstance().player, this.mouseStartX, this.mouseStartY, this.rotationX, this.rotationY, -500, this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+            ModelPreviewRenderer.submitPlayerOverlay(guiGraphics, Minecraft.getInstance().player, this.mouseStartX, this.mouseStartY, this.rotationX, this.rotationY, this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false));
         }
         super.render(guiGraphics, mouseX, mouseY, partialTick);
     }

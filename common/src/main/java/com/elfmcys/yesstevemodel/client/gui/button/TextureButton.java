@@ -68,14 +68,14 @@ public class TextureButton extends Button {
     }
 
     public void renderPlayerPreview(GuiGraphics guiGraphics, float partialTick) {
-        // TODO 1.21.8 port: disabled to isolate GUI render-state corruption.
-        // ModelPreviewRenderer.renderLivingEntityPreview still uses the 1.21.4
-        // immediate-mode path; see ModelButton.renderWidget for details.
-        // guiGraphics.enableScissor(getX(), getY(), getX() + this.width, (getY() + this.height) - 20);
-        // CustomPlayerRenderer playerRenderer = RendererManager.getPlayerRenderer();
-        // PlayerRenderState state = new PlayerRenderState();
-        // playerRenderer.extractRenderState(this.previewEntity.entity, state, partialTick);
-        // ModelPreviewRenderer.renderLivingEntityPreview(getX() + (this.width / 2.0f), getY() + (this.height / 2.0f) + 24.0f, 35.0f, partialTick, this.previewEntity, state, playerRenderer, false, true);
-        // guiGraphics.disableScissor();
+        ModelPreviewRenderer.submitLivingEntityPreview(
+                guiGraphics,
+                getX(), getY(), getX() + this.width, (getY() + this.height) - 20,
+                35,
+                partialTick,
+                this.previewEntity,
+                false,
+                true
+        );
     }
 }

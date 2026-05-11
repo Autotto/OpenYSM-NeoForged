@@ -173,20 +173,25 @@ public class ModelButton extends Button {
         if (this.backgroundTexture != null) {
             guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.backgroundTexture.getResourceLocation().get(), x, y, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
         }
-        double guiScale = Minecraft.getInstance().getWindow().getGuiScale();
-        // TODO 1.21.8 port: disabled to isolate GUI render-state corruption.
-        // ModelPreviewRenderer.renderLivingEntityPreview still uses the 1.21.4
-        // immediate-mode path (RenderSystem.getModelViewStack + bufferSource.endBatch)
-        // which leaks state into the deferred GuiRenderer.
-        // guiGraphics.enableScissor(x, y, x + this.width, (y + this.height) - 20);
-        // CustomPlayerRenderer playerRenderer = RendererManager.getPlayerRenderer();
-        // PlayerRenderState state = new PlayerRenderState();
-        // playerRenderer.extractRenderState(this.modelIdHolder.entity, state, partialTick);
-        // ModelPreviewRenderer.renderLivingEntityPreview(x + (this.width / 2.0f), y + (this.height / 2.0f) + 20.0f, 30.0f, minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false), this.modelIdHolder, state, playerRenderer, this.disablePreviewRotation, true);
-        // guiGraphics.disableScissor();
+
+        guiGraphics.enableScissor(x, y, x + this.width, (y + this.height) - 20);
+
+        ModelPreviewRenderer.submitLivingEntityPreview(
+                guiGraphics,
+                x, y, x + this.width, (y + this.height) - 2,
+                30,
+                minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false),
+                this.modelIdHolder,
+                this.disablePreviewRotation,
+                true
+        );
+
+        guiGraphics.disableScissor();
+
         if (this.foregroundTexture != null) {
             guiGraphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, this.foregroundTexture.getResourceLocation().get(), x, y, 0.0f, 0.0f, this.width, this.height, this.width, this.height);
         }
+
         List listSplit = font.split(getMessage(), 45);
         if (listSplit.size() > 1) {
             guiGraphics.drawCenteredString(font, (FormattedCharSequence) listSplit.get(0), x + (this.width / 2), (y + this.height) - 19, 0xFFF3F0E0);
@@ -194,12 +199,14 @@ public class ModelButton extends Button {
         } else {
             guiGraphics.drawCenteredString(font, getMessage(), x + (this.width / 2), (y + this.height) - 15, 0xFFF3F0E0);
         }
+
         if (!this.isStarred && isHoveredOrFocused()) {
             guiGraphics.fillGradient(x, y + 1, x + 1, (y + this.height) - 1, -790560, -790560);
             guiGraphics.fillGradient(x, y, x + this.width, y + 1, -790560, -790560);
             guiGraphics.fillGradient((x + this.width) - 1, y + 1, x + this.width, (y + this.height) - 1, -790560, -790560);
             guiGraphics.fillGradient(x, (y + this.height) - 1, x + this.width, y + this.height, -790560, -790560);
         }
+
         if (this.isStarred) {
             guiGraphics.fillGradient(x, y, x + this.width, y + this.height, -1625152990, -1625152990);
         }
@@ -210,6 +217,7 @@ public class ModelButton extends Button {
                 }
             });
         }
+
     }
 
     public void renderTooltip(GuiGraphics guiGraphics, Screen screen, int mouseX, int mouseY) {

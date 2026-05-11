@@ -87,8 +87,54 @@ public abstract class GeoReplacedEntityRenderer<TEntity extends Player, T extend
         if (RenderLivingBridge.firePre(t.getEntity(), this, partialTick, poseStack, multiBufferSource, packedLight)) {
             return;
         }
-        AnimationEvent<?> event = t.processAnimation(partialTick);
         TEntity entity = t.getEntity();
+
+        // AnimatableEntity#processAnimationImpl reads yBodyRot/yHeadRot/xRot directly
+        // off the entity, not off the captured PlayerRenderState. In PIP/preview flows
+        // the state was extracted with the intended (preview / mouse-follow) rotation
+        // but the entity was already restored to its real values before the deferred
+        // render fired. Without this sync the doll yaw tracks the world player.
+        float savedYBodyRot = 0.0f, savedYBodyRotO = 0.0f;
+        float savedYHeadRot = 0.0f, savedYHeadRotO = 0.0f;
+        float savedYRot = 0.0f, savedYRotO = 0.0f;
+        float savedXRot = 0.0f, savedXRotO = 0.0f;
+        boolean syncRotationsForPreview = com.elfmcys.yesstevemodel.client.renderer.ModelPreviewRenderer.isPreview() && entity != null;
+        if (syncRotationsForPreview) {
+            savedYBodyRot = entity.yBodyRot;
+            savedYBodyRotO = entity.yBodyRotO;
+            savedYHeadRot = entity.yHeadRot;
+            savedYHeadRotO = entity.yHeadRotO;
+            savedYRot = entity.getYRot();
+            savedYRotO = entity.yRotO;
+            savedXRot = entity.getXRot();
+            savedXRotO = entity.xRotO;
+
+            float bodyRot = state.bodyRot;
+            float headYaw = state.bodyRot + state.yRot;
+            entity.yBodyRot = bodyRot;
+            entity.yBodyRotO = bodyRot;
+            entity.yHeadRot = headYaw;
+            entity.yHeadRotO = headYaw;
+            entity.setYRot(headYaw);
+            entity.yRotO = headYaw;
+            entity.setXRot(state.xRot);
+            entity.xRotO = state.xRot;
+        }
+        AnimationEvent<?> event;
+        try {
+            event = t.processAnimation(partialTick);
+        } finally {
+            if (syncRotationsForPreview) {
+                entity.yBodyRot = savedYBodyRot;
+                entity.yBodyRotO = savedYBodyRotO;
+                entity.yHeadRot = savedYHeadRot;
+                entity.yHeadRotO = savedYHeadRotO;
+                entity.setYRot(savedYRot);
+                entity.yRotO = savedYRotO;
+                entity.setXRot(savedXRot);
+                entity.xRotO = savedXRotO;
+            }
+        }
         Minecraft minecraft = Minecraft.getInstance();
         if (event != null && minecraft.player != null) {
             EntityModelData modelData = event.getModelData();
