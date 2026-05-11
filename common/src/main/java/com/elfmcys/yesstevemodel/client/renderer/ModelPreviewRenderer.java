@@ -423,6 +423,10 @@ public final class ModelPreviewRenderer {
         CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
         AvatarRenderState state = new AvatarRenderState();
         renderer.extractRenderState((Player) entity, state, partialTick);
+        // Force full-bright lightmap (mirrors InventoryScreen.renderEntityInInventoryFollowsMouse).
+        // extractRenderState writes state.lightCoords from the entity's world position, so a
+        // player standing in a dark cave / at night would render the GUI preview almost black.
+        state.lightCoords = net.minecraft.client.renderer.LightTexture.FULL_BRIGHT;
 
         // Override the captured rotation. GeoReplacedEntityRenderer#renderEntityWithTexture
         // re-syncs the entity's yaw to these state fields around processAnimation, so
@@ -486,6 +490,7 @@ public final class ModelPreviewRenderer {
         CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
         AvatarRenderState state = new AvatarRenderState();
         renderer.extractRenderState(localPlayer, state, partialTick);
+        state.lightCoords = net.minecraft.client.renderer.LightTexture.FULL_BRIGHT;
         PreviewEntityRegistry.register(state, cap);
 
         // Apply yawOffset on top of the captured natural body rotation so the
@@ -568,6 +573,7 @@ public final class ModelPreviewRenderer {
         CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
         AvatarRenderState state = new AvatarRenderState();
         renderer.extractRenderState((Player) entity, state, partialTick);
+        state.lightCoords = net.minecraft.client.renderer.LightTexture.FULL_BRIGHT;
 
         // Old: yBodyRot = -yaw, yHeadRot = -yaw, yRot = 180 -> state.bodyRot=-yaw,
         // state.yRot=180+yaw (net head). We replicate that so the body rotates with

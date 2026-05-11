@@ -52,7 +52,16 @@ public class ReplacePlayerRenderEvent {
                     MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
                     RenderContext.enter(collector, cameraState);
                     try {
-                        RendererManager.getPlayerRenderer().render(entity, renderState, entity.getYRot(), ModelPreviewRenderer.isPreview() ? 1.0f : partialTick, poseStack, bufferSource, renderState.lightCoords);
+                        // Force full-bright lightmap in any preview/PIP context (inventory
+                        // paper-doll, PlayerModelScreen.renderModelPreview, ModelButton, ...).
+                        // Vanilla InventoryScreen.extractRenderState already does this, but
+                        // some preview paths (and any state we don't own) leak the world
+                        // light value through, which makes the YSM model render almost black
+                        // when the player is in a dark place.
+                        int packedLight = ModelPreviewRenderer.isPreview()
+                                ? net.minecraft.client.renderer.LightTexture.FULL_BRIGHT
+                                : renderState.lightCoords;
+                        RendererManager.getPlayerRenderer().render(entity, renderState, entity.getYRot(), ModelPreviewRenderer.isPreview() ? 1.0f : partialTick, poseStack, bufferSource, packedLight);
                         bufferSource.endBatch();
                     } finally {
                         RenderContext.exit();
