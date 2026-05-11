@@ -38,7 +38,8 @@ public class OuterFileTexture extends AbstractTexture implements ITextureMap {
             int height = imageIn.getHeight();
             TextureUtil.prepareImage(this.getId(), 0, width, height);
             // use GL_NEAREST
-            this.setFilter(false, false);
+            this.setFilter(net.minecraft.util.TriState.FALSE, false);
+            this.setClamp(false);
             imageIn.upload(0, 0, 0, 0, 0, width, height, true);
         } catch (IOException e) {
             e.printStackTrace();
