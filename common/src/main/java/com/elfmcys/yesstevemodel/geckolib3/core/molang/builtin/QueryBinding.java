@@ -152,7 +152,7 @@ public class QueryBinding extends ContextBinding {
     }
 
     private static boolean hasCape(AbstractClientPlayer abstractClientPlayer) {
-        return !abstractClientPlayer.isInvisible() && abstractClientPlayer.isModelPartShown(PlayerModelPart.CAPE) && abstractClientPlayer.getSkin().capeTexture() != null;
+        return !abstractClientPlayer.isInvisible() && abstractClientPlayer.isModelPartShown(PlayerModelPart.CAPE) && abstractClientPlayer.getSkin().cape() != null;
     }
 
     private static int getEquipmentCount(LivingEntity entity) {
@@ -194,9 +194,9 @@ public class QueryBinding extends ContextBinding {
         float gameTime = context.animationEvent().getFrameTime();
         Player player = context.entity();
         AbstractClientPlayer ap = (AbstractClientPlayer) player;
-        float fLerp = (float) (Mth.lerp(gameTime, player.xCloakO, player.xCloak) - Mth.lerp(gameTime, player.xo, player.getX()));
-        float fLerp2 = (float) (Mth.lerp(gameTime, player.yCloakO, player.yCloak) - Mth.lerp(gameTime, player.yo, player.getY()));
-        float fLerp3 = (float) (Mth.lerp(gameTime, player.zCloakO, player.zCloak) - Mth.lerp(gameTime, player.zo, player.getZ()));
+        float fLerp = (float) (ap.avatarState().getInterpolatedCloakX(gameTime) - Mth.lerp(gameTime, player.xo, player.getX()));
+        float fLerp2 = (float) (ap.avatarState().getInterpolatedCloakY(gameTime) - Mth.lerp(gameTime, player.yo, player.getY()));
+        float fLerp3 = (float) (ap.avatarState().getInterpolatedCloakZ(gameTime) - Mth.lerp(gameTime, player.zo, player.getZ()));
         float f = player.yBodyRotO + (player.yBodyRot - player.yBodyRotO);
         float fSin = Mth.sin(f * 0.017453292f);
         float f2 = -Mth.cos(f * 0.017453292f);
@@ -205,7 +205,7 @@ public class QueryBinding extends ContextBinding {
         if (fClamp2 < 0.0f) {
             fClamp2 = 0.0f;
         }
-        float fSin2 = fClamp + (Mth.sin(Mth.lerp(gameTime, ap.walkDistO, ap.walkDist) * 6.0f) * 32.0f * Mth.lerp(gameTime, ap.oBob, ap.bob));
+        float fSin2 = fClamp + (Mth.sin(ap.avatarState().getInterpolatedWalkDistance(gameTime) * 6.0f) * 32.0f * ap.avatarState().getInterpolatedBob(gameTime));
         if (player.isCrouching()) {
             fSin2 += 25.0f;
         }

@@ -54,7 +54,9 @@ public class RendererManager {
                 resourceManager,
                 Minecraft.getInstance().getEntityModels(),
                 ((EntityRenderDispatcherAccessor) Minecraft.getInstance().getEntityRenderDispatcher()).getEquipmentAssetManager(),
-                Minecraft.getInstance().font
+                Minecraft.getInstance().getAtlasManager(),
+                Minecraft.getInstance().font,
+                Minecraft.getInstance().playerSkinRenderCache()
         );
         playerRenderer = new CustomPlayerRenderer(context);
         projectileRenderer = new ProjectileRenderer(context);

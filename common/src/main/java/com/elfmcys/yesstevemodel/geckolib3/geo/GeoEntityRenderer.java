@@ -57,7 +57,7 @@ public abstract class GeoEntityRenderer<TEntity extends Entity, T extends Animat
                 poseStack.popPose();
             }
         }
-         super.render(state, poseStack, multiBufferSource, i);
+        // 1.21.9: super.render(...) removed. Engine drives default rendering via submit() pipeline.
     }
 
     @Override

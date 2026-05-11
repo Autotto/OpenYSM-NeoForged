@@ -4,7 +4,7 @@ import com.elfmcys.yesstevemodel.client.entity.CustomPlayerEntity;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import rip.ysm.compat.cosmeticarmorreworked.CosmeticArmorHelper;
 import com.elfmcys.yesstevemodel.geckolib3.geo.GeoLayerRenderer;
 import com.elfmcys.yesstevemodel.geckolib3.geo.animated.AnimatedGeoModel;
@@ -35,17 +35,17 @@ public class CustomPlayerElytraLayer extends GeoLayerRenderer<CustomPlayerEntity
     }
 
     @Override
-    public void render(PlayerRenderState state, PoseStack poseStack, MultiBufferSource bufferSource, int packedLightIn, CustomPlayerEntity entityLivingBaseIn, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void render(AvatarRenderState state, PoseStack poseStack, MultiBufferSource bufferSource, int packedLightIn, CustomPlayerEntity entityLivingBaseIn, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
         ResourceLocation cloakTextureLocation;
         LivingEntity entity = entityLivingBaseIn.getEntity();
         ItemStack stack = CosmeticArmorHelper.getElytraItem(entity);
         AnimatedGeoModel animatedGeoModel = entityLivingBaseIn.getCurrentModel();
         if (!stack.isEmpty() && animatedGeoModel != null && !animatedGeoModel.elytraBones().isEmpty() && (entity instanceof AbstractClientPlayer abstractClientPlayer)) {
-            net.minecraft.client.resources.PlayerSkin skin = abstractClientPlayer.getSkin();
-            if (skin.elytraTexture() != null) {
-                cloakTextureLocation = skin.elytraTexture();
-            } else if (skin.capeTexture() != null && abstractClientPlayer.isModelPartShown(PlayerModelPart.CAPE)) {
-                cloakTextureLocation = skin.capeTexture();
+            net.minecraft.world.entity.player.PlayerSkin skin = abstractClientPlayer.getSkin();
+            if (skin.elytra() != null) {
+                cloakTextureLocation = skin.elytra().texturePath();
+            } else if (skin.cape() != null && abstractClientPlayer.isModelPartShown(PlayerModelPart.CAPE)) {
+                cloakTextureLocation = skin.cape().texturePath();
             } else {
                 cloakTextureLocation = WINGS_LOCATION;
             }
@@ -55,7 +55,7 @@ public class CustomPlayerElytraLayer extends GeoLayerRenderer<CustomPlayerEntity
             poseStack.mulPose(Axis.ZP.rotationDegrees(180.0f));
             poseStack.scale(2.0f, 2.0f, 2.0f);
             this.elytraModel.setupAnim(state);
-            this.elytraModel.renderToBuffer(poseStack, ItemRenderer.getArmorFoilBuffer(bufferSource, RenderType.armorCutoutNoCull(cloakTextureLocation), stack.hasFoil()), packedLightIn, OverlayTexture.NO_OVERLAY, -1);
+            this.elytraModel.renderToBuffer(poseStack, ItemRenderer.getFoilBuffer(bufferSource, RenderType.armorCutoutNoCull(cloakTextureLocation), false, stack.hasFoil()), packedLightIn, OverlayTexture.NO_OVERLAY, -1);
             poseStack.popPose();
         }
     }

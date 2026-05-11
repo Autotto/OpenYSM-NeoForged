@@ -1,5 +1,6 @@
 package com.elfmcys.yesstevemodel.client.renderer;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.Util;
@@ -42,6 +43,11 @@ public class CustomEntityTranslucentRenderType extends RenderType {
     @Override
     public VertexFormat.Mode mode() {
         return this.delegate.mode();
+    }
+
+    @Override
+    public RenderPipeline pipeline() {
+        return this.delegate.pipeline();
     }
 
     @Override

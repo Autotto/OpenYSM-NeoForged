@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ParrotRenderer;
 import net.minecraft.client.renderer.entity.state.ParrotRenderState;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
@@ -34,7 +34,7 @@ public class CustomPlayerParrotLayer extends GeoLayerRenderer<CustomPlayerEntity
     }
 
     @Override
-    public void render(PlayerRenderState state, PoseStack poseStack, MultiBufferSource bufferSource, int packedLightIn, CustomPlayerEntity entityLivingBaseIn, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void render(AvatarRenderState state, PoseStack poseStack, MultiBufferSource bufferSource, int packedLightIn, CustomPlayerEntity entityLivingBaseIn, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
         Player player = entityLivingBaseIn.getEntity();
         AnimatedGeoModel model = entityLivingBaseIn.getCurrentModel();
         if (model == null) {
@@ -48,28 +48,24 @@ public class CustomPlayerParrotLayer extends GeoLayerRenderer<CustomPlayerEntity
         }
     }
 
-    private void renderParrot(PoseStack poseStack, PlayerRenderState state, MultiBufferSource bufferSource, AnimatedGeoModel model, int packedLightIn, Player player, float limbSwing, float limbSwingAmount, float netHeadYaw, float headPitch, boolean isLeftShoulder) {
-        CompoundTag shoulderEntityLeft = isLeftShoulder ? player.getShoulderEntityLeft() : player.getShoulderEntityRight();
+    private void renderParrot(PoseStack poseStack, AvatarRenderState state, MultiBufferSource bufferSource, AnimatedGeoModel model, int packedLightIn, Player player, float limbSwing, float limbSwingAmount, float netHeadYaw, float headPitch, boolean isLeftShoulder) {
         Parrot.Variant variant = isLeftShoulder ? state.parrotOnLeftShoulder : state.parrotOnRightShoulder;
 
         if (variant == null)
             return;
 
-        EntityType.byString(shoulderEntityLeft.getStringOr(TAG_ID, "")).filter(entityType -> entityType == EntityType.PARROT).ifPresent(entityType -> {
-            poseStack.pushPose();
-            applyParrotTransform(poseStack, model, isLeftShoulder);
-//            poseStack.translate(0.0d, 1.5d, 0.0d);
-            poseStack.mulPose(Axis.ZP.rotationDegrees(180.0f));
-            this.renderOnShoulder(poseStack, bufferSource, packedLightIn, state, variant, headPitch, netHeadYaw, isLeftShoulder);
-            poseStack.popPose();
-        });
+        poseStack.pushPose();
+        applyParrotTransform(poseStack, model, isLeftShoulder);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(180.0f));
+        this.renderOnShoulder(poseStack, bufferSource, packedLightIn, state, variant, headPitch, netHeadYaw, isLeftShoulder);
+        poseStack.popPose();
     }
 
     private void renderOnShoulder(
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             int packedLight,
-            PlayerRenderState state,
+            AvatarRenderState state,
             Parrot.Variant variant,
             float pitch,
             float yaw,

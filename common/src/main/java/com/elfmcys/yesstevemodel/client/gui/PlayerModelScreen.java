@@ -35,6 +35,9 @@ import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -565,16 +568,16 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         super.tick();
     }
 
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (this.searchBox.mouseClicked(mouseX, mouseY, button)) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (this.searchBox.mouseClicked(event, doubleClick)) {
             setFocused(this.searchBox);
             return true;
         }
         if (this.searchBox.isFocused()) {
             this.searchBox.setFocused(false);
         }
-        boolean zMouseClicked = super.mouseClicked(mouseX, mouseY, button);
-        if (!zMouseClicked && button == 1 && StringUtils.isNotBlank(currentPath)) {
+        boolean zMouseClicked = super.mouseClicked(event, doubleClick);
+        if (!zMouseClicked && event.button() == 1 && StringUtils.isNotBlank(currentPath)) {
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
             navigateUp();
             zMouseClicked = true;
@@ -582,12 +585,12 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         return zMouseClicked;
     }
 
-    public boolean charTyped(char codePoint, int modifiers) {
+    public boolean charTyped(CharacterEvent event) {
         if (this.searchBox == null) {
             return false;
         }
         String value = this.searchBox.getValue();
-        if (this.searchBox.charTyped(codePoint, modifiers)) {
+        if (this.searchBox.charTyped(event)) {
             if (!Objects.equals(value, this.searchBox.getValue())) {
                 resetCurrentPage();
                 init();
@@ -598,17 +601,17 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         return false;
     }
 
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (handleToggleKey(keyCode, scanCode, modifiers)) {
+    public boolean keyPressed(KeyEvent event) {
+        if (handleToggleKey(event)) {
             return true;
         }
-        boolean zIsPresent = InputConstants.getKey(keyCode, scanCode).getNumericKeyValue().isPresent();
+        boolean zIsPresent = InputConstants.getKey(event).getNumericKeyValue().isPresent();
         String value = this.searchBox.getValue();
         if (zIsPresent) {
             return true;
         }
-        if (!this.searchBox.keyPressed(keyCode, scanCode, modifiers)) {
-            return (this.searchBox.isFocused() && this.searchBox.isVisible() && keyCode != 256) || super.keyPressed(keyCode, scanCode, modifiers);
+        if (!this.searchBox.keyPressed(event)) {
+            return (this.searchBox.isFocused() && this.searchBox.isVisible() && event.key() != 256) || super.keyPressed(event);
         }
         if (!Objects.equals(value, this.searchBox.getValue())) {
             resetCurrentPage();
@@ -618,8 +621,8 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         return true;
     }
 
-    private boolean handleToggleKey(int keyCode, int scanCode, int modifiers) {
-        if (PlayerModelToggleKey.KEY_MAPPING.matches(keyCode, scanCode) && !this.searchBox.isFocused()) {
+    private boolean handleToggleKey(KeyEvent event) {
+        if (PlayerModelToggleKey.KEY_MAPPING.matches(event) && !this.searchBox.isFocused()) {
             onClose();
             return true;
         }

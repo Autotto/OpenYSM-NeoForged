@@ -5,8 +5,8 @@ import com.elfmcys.yesstevemodel.event.api.SpecialPlayerRenderEvent;
 import dev.architectury.event.EventResult;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.entity.player.Player;
 import rip.ysm.api.PlatformAPI;
 
@@ -38,9 +38,9 @@ public class PlayerSkinTextureManager {
         Player player = event.getPlayer();
         if (isDefaultSkin(event.getModelId()) && (player instanceof AbstractClientPlayer abstractClientPlayer)) {
             Minecraft minecraft = Minecraft.getInstance();
-            PlayerSkin skin = minecraft.getSkinManager().getInsecureSkin(abstractClientPlayer.getGameProfile());
-            if (skin != null && skin.texture() != null) {
-                location = skin.texture();
+            PlayerSkin skin = minecraft.getSkinManager().createLookup(abstractClientPlayer.getGameProfile(), false).get();
+            if (skin != null && skin.body() != null) {
+                location = skin.body().texturePath();
             } else {
                 location = getSkinTexture(event.getModelId());
             }

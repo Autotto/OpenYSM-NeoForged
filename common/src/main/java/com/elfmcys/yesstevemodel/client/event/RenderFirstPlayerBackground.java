@@ -79,8 +79,8 @@ public class RenderFirstPlayerBackground {
 
     private static void applyHandTransform(PoseStack poseStack, float partialTick, Player player) {
         AbstractClientPlayer ap = (AbstractClientPlayer) player;
-        float walkPhase = -(ap.walkDist + ((ap.walkDist - ap.walkDistO) * partialTick));
-        float fLerp = Mth.lerp(partialTick, ap.oBob, ap.bob);
+        float walkPhase = ap.avatarState().getBackwardsInterpolatedWalkDistance(partialTick);
+        float fLerp = ap.avatarState().getInterpolatedBob(partialTick);
         poseStack.translate((-Mth.sin(walkPhase * 3.1415927f)) * fLerp * 0.5f, Math.abs(Mth.cos(walkPhase * 3.1415927f) * fLerp), 0.0d);
         poseStack.mulPose(Axis.ZN.rotationDegrees(Mth.sin(walkPhase * 3.1415927f) * fLerp * 3.0f));
         poseStack.mulPose(Axis.XN.rotationDegrees(Math.abs(Mth.cos((walkPhase * 3.1415927f) - 0.2f) * fLerp) * 5.0f));

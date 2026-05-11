@@ -40,6 +40,8 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -461,7 +463,8 @@ public class AnimationRouletteScreen extends Screen {
         this.configScrollOffset = Math.min(this.maxConfigScroll, this.configScrollOffset + i);
     }
 
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        int button = event.button();
         if (-1 < this.hoveredIndex && this.hoveredIndex < this.currentProperties.size()) {
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
             String str = this.currentProperties.getKeyAt(this.hoveredIndex);
@@ -483,11 +486,11 @@ public class AnimationRouletteScreen extends Screen {
             }
         }
         for (GuiEventListener guiEventListener : children()) {
-            double scrolledMouseY = mouseY;
+            MouseButtonEvent scrolledEvent = event;
             if (guiEventListener instanceof ISpecialWidget) {
-                scrolledMouseY = mouseY + this.configScrollOffset;
+                scrolledEvent = new MouseButtonEvent(event.x(), event.y() + this.configScrollOffset, event.buttonInfo());
             }
-            if (guiEventListener.mouseClicked(mouseX, scrolledMouseY, button)) {
+            if (guiEventListener.mouseClicked(scrolledEvent, doubleClick)) {
                 setFocused(guiEventListener);
                 if (button == 0) {
                     setDragging(true);
@@ -499,12 +502,12 @@ public class AnimationRouletteScreen extends Screen {
         return false;
     }
 
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (KeyMappingFactory.isActiveAndMatches(AnimationRouletteKey.KEY_ROULETTE, keyCode, scanCode)) {
+    public boolean keyPressed(KeyEvent event) {
+        if (KeyMappingFactory.isActiveAndMatches(AnimationRouletteKey.KEY_ROULETTE, event)) {
             onClose();
             return true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
     private void showConfigGroup(String str) {

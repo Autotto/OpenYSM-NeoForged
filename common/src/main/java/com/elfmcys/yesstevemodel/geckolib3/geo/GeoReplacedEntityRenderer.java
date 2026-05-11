@@ -21,7 +21,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,7 +40,7 @@ import org.joml.Vector3f;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class GeoReplacedEntityRenderer<TEntity extends Player, T extends LivingAnimatable<TEntity>, S extends PlayerRenderState> extends LivingEntityRenderer<TEntity, S, PlayerModel> implements IGeoRenderer<T> {
+public abstract class GeoReplacedEntityRenderer<TEntity extends Player, T extends LivingAnimatable<TEntity>, S extends AvatarRenderState> extends LivingEntityRenderer<TEntity, S, PlayerModel> implements IGeoRenderer<T> {
 
     public final List<GeoLayerRenderer<T>> layerRenderers = new ObjectArrayList<>();
 
@@ -90,7 +90,7 @@ public abstract class GeoReplacedEntityRenderer<TEntity extends Player, T extend
         TEntity entity = t.getEntity();
 
         // AnimatableEntity#processAnimationImpl reads yBodyRot/yHeadRot/xRot directly
-        // off the entity, not off the captured PlayerRenderState. In PIP/preview flows
+        // off the entity, not off the captured AvatarRenderState. In PIP/preview flows
         // the state was extracted with the intended (preview / mouse-follow) rotation
         // but the entity was already restored to its real values before the deferred
         // render fired. Without this sync the doll yaw tracks the world player.
@@ -173,7 +173,11 @@ public abstract class GeoReplacedEntityRenderer<TEntity extends Player, T extend
             }
             poseStack.popPose();
         }
-        ((LivingEntityRendererAccessor) this).tlm$renderNameTag(state, poseStack, multiBufferSource, packedLight);
+        net.minecraft.client.renderer.SubmitNodeCollector activeCollector = com.elfmcys.yesstevemodel.client.renderer.RenderContext.collector();
+        net.minecraft.client.renderer.state.CameraRenderState activeCameraState = com.elfmcys.yesstevemodel.client.renderer.RenderContext.camera();
+        if (activeCollector != null && activeCameraState != null) {
+            ((LivingEntityRendererAccessor) this).tlm$renderNameTag(state, poseStack, activeCollector, activeCameraState);
+        }
         RenderLivingBridge.firePost(entity, this, partialTick, poseStack, multiBufferSource, packedLight);
     }
 

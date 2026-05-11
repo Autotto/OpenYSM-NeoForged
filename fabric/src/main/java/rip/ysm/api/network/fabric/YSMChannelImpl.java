@@ -14,7 +14,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import com.elfmcys.yesstevemodel.access.ServerCommonPacketListenerImplAccess;
+import com.elfmcys.yesstevemodel.access.ServerCommonPacketListenerImplAccessor;
 import rip.ysm.api.network.PacketContext;
 import rip.ysm.api.network.PacketDirection;
 import rip.ysm.api.network.fabric.client.YSMChannelClientImpl;
@@ -46,7 +46,7 @@ public final class YSMChannelImpl {
 
         ServerPlayNetworking.registerGlobalReceiver(YSMPayload.TYPE, (payload, context) ->
                 dispatch(payload.toBuf(), new ServerPacketContext(context.server(), context.player(),
-                        ((ServerCommonPacketListenerImplAccess) (Object) context.player().connection).ysm$getConnection())));
+                        ((ServerCommonPacketListenerImplAccessor) (Object) context.player().connection).ysm$getConnection())));
 
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             YSMChannelClientImpl.init(channelId);

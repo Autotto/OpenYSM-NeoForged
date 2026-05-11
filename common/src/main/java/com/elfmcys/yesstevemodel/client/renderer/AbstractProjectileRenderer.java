@@ -61,7 +61,8 @@ public abstract class AbstractProjectileRenderer<TEntity extends Projectile, T e
                 poseStack.popPose();
             }
         }
-         super.render(state, poseStack, bufferSource, packedLight);
+        // 1.21.9: super.render(...) replaced by engine-driven submit(); defaults (name tag, shadow,
+        // hitboxes) are now handled when the dispatcher calls submit() on this renderer separately.
     }
 
     @Override

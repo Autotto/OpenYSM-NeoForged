@@ -2,7 +2,7 @@ package com.elfmcys.yesstevemodel.network;
 
 import com.elfmcys.yesstevemodel.YesSteveModel;
 import com.elfmcys.yesstevemodel.mixin.ConnectionAccessor;
-import com.elfmcys.yesstevemodel.access.ServerCommonPacketListenerImplAccess;
+import com.elfmcys.yesstevemodel.access.ServerCommonPacketListenerImplAccessor;
 import com.elfmcys.yesstevemodel.network.message.*;
 import io.netty.util.AttributeKey;
 import net.minecraft.client.Minecraft;
@@ -40,7 +40,7 @@ public final class NetworkHandler {
     }
 
     public static boolean isPlayerConnected(ServerPlayer serverPlayer) {
-        return serverPlayer.connection != null && isConnectionValid(((ServerCommonPacketListenerImplAccess) serverPlayer.connection).ysm$getConnection());
+        return serverPlayer.connection != null && isConnectionValid(((ServerCommonPacketListenerImplAccessor) serverPlayer.connection).ysm$getConnection());
     }
 
     public static boolean isClientConnected() {

@@ -163,9 +163,9 @@ public class YSMBinding extends ContextBinding {
         playerEntityVar("nametag_distance", ctx -> ForgeAttributes.getValue(ctx.entity(), ForgeAttributes.nametagDistance(), 64.0D));
         playerEntityVar("in_shield_block_cooldown", YSMBinding::isInShieldBlockCooldown);
 
-        clientPlayerEntityVar("elytra_rot_x", ctx -> Math.toDegrees(ctx.entity().elytraRotX));
-        clientPlayerEntityVar("elytra_rot_y", ctx -> Math.toDegrees(ctx.entity().elytraRotY));
-        clientPlayerEntityVar("elytra_rot_z", ctx -> Math.toDegrees(ctx.entity().elytraRotZ));
+        clientPlayerEntityVar("elytra_rot_x", ctx -> Math.toDegrees(ctx.entity().elytraAnimationState.getRotX(ctx.animationEvent().getFrameTime())));
+        clientPlayerEntityVar("elytra_rot_y", ctx -> Math.toDegrees(ctx.entity().elytraAnimationState.getRotY(ctx.animationEvent().getFrameTime())));
+        clientPlayerEntityVar("elytra_rot_z", ctx -> Math.toDegrees(ctx.entity().elytraAnimationState.getRotZ(ctx.animationEvent().getFrameTime())));
 
         localPlayerEntityVar("hit_target_id", YSMBinding::getHitTargetId);
         localPlayerEntityVar("hit_target_type", YSMBinding::getHitTargetType);
@@ -421,15 +421,15 @@ public class YSMBinding extends ContextBinding {
     }
 
     public static String getShoulderParrotVariant(Player player, boolean leftShoulder) {
-        CompoundTag shoulderEntityLeft = leftShoulder ? player.getShoulderEntityLeft() : player.getShoulderEntityRight();
-        return EntityType.byString(shoulderEntityLeft.getStringOr("id", "")).filter(entityType -> {
-            return entityType == EntityType.PARROT;
-        }).map(entityType2 -> {
-            return Parrot.Variant.byId(shoulderEntityLeft.getIntOr("Variant", 0)).name().toLowerCase(Locale.ENGLISH);
-        }).orElse("empty");
+        if (!(player instanceof net.minecraft.client.player.AbstractClientPlayer acp)) {
+            return "empty";
+        }
+        Parrot.Variant variant = acp.getParrotVariantOnShoulder(leftShoulder);
+        return variant == null ? "empty" : variant.name().toLowerCase(Locale.ENGLISH);
     }
 
     private static boolean hasShoulderParrot(Player player, boolean leftShoulder) {
-        return !(leftShoulder ? player.getShoulderEntityLeft() : player.getShoulderEntityRight()).isEmpty();
+        return player instanceof net.minecraft.client.player.AbstractClientPlayer acp
+                && acp.getParrotVariantOnShoulder(leftShoulder) != null;
     }
 }

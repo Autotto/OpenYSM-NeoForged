@@ -17,6 +17,7 @@ import dev.architectury.event.EventResult;
 import dev.architectury.event.events.client.ClientRawInputEvent;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.player.LocalPlayer;
 import rip.ysm.api.client.KeyMappingFactory;
 import rip.ysm.api.PlatformAPI;
@@ -37,7 +38,7 @@ public final class ExtraAnimationKey {
             initialized = true;
             if (YesSteveModel.isAvailable()) {
                 for (int i = 0; i <= 7; i++) {
-                    KeyMapping eventMapping = KeyMappingFactory.createInGameNone(String.format("key.yes_steve_model.extra_animation.%d.desc", Integer.valueOf(i)), InputConstants.Type.KEYSYM, -1, "key.category.yes_steve_model");
+                    KeyMapping eventMapping = KeyMappingFactory.createInGameNone(String.format("key.yes_steve_model.extra_animation.%d.desc", Integer.valueOf(i)), InputConstants.Type.KEYSYM, -1, KeyMappingFactory.YSM_CATEGORY);
                     KEY_MAPPINGS.add(eventMapping);
                 }
             }
@@ -49,19 +50,19 @@ public final class ExtraAnimationKey {
         if (PlatformAPI.isServer()) {
             return;
         }
-        ClientRawInputEvent.KEY_PRESSED.register((client, keyCode, scanCode, action, modifiers) -> {
-            onKeyInput(action, keyCode, scanCode);
+        ClientRawInputEvent.KEY_PRESSED.register((client, action, event) -> {
+            onKeyInput(action, event);
             return EventResult.pass();
         });
     }
 
-    private static void onKeyInput(int action, int keyCode, int scanCode) {
+    private static void onKeyInput(int action, KeyEvent event) {
         if (!YesSteveModel.isAvailable() || !InputUtil.isPlayerReady()) {
             return;
         }
         LocalPlayer localPlayer = Minecraft.getInstance().player;
         for (KeyMapping eventMapping : KEY_MAPPINGS) {
-            if (action == 1 && InputUtil.isKeyPressed(keyCode, scanCode, eventMapping) && localPlayer != null && !AnimationLockEvent.isPlayerMoving(localPlayer)) {
+            if (action == 1 && InputUtil.isKeyPressed(event, eventMapping) && localPlayer != null && !AnimationLockEvent.isPlayerMoving(localPlayer)) {
                 PlayerCapability.get(localPlayer).ifPresent(cap -> {
                     ModelAssembly modelAssembly = cap.getModelAssembly();
                     int index = KEY_MAPPINGS.indexOf(eventMapping);

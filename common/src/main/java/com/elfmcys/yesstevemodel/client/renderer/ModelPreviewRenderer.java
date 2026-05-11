@@ -2,7 +2,7 @@ package com.elfmcys.yesstevemodel.client.renderer;
 
 import com.elfmcys.yesstevemodel.capability.VehicleCapability;
 import com.elfmcys.yesstevemodel.capability.PlayerCapability;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import rip.ysm.compat.firstperson.FirstPersonCompat;
 import rip.ysm.compat.oculus.OculusCompat;
 import rip.ysm.compat.touhoulittlemaid.TouhouLittleMaidCompat;
@@ -101,7 +101,7 @@ public final class ModelPreviewRenderer {
     }
 
     // 动画测试界面的模型
-    public static void renderEntityPreview(float x, float y, float scale, float pitch, float yaw, float partialTick, AnimatableEntity animatableEntity, PlayerRenderState state, GeoReplacedEntityRenderer renderer, boolean renderGround) {
+    public static void renderEntityPreview(float x, float y, float scale, float pitch, float yaw, float partialTick, AnimatableEntity animatableEntity, AvatarRenderState state, GeoReplacedEntityRenderer renderer, boolean renderGround) {
         setPreviewMode(true);
         LivingEntity livingEntity = (LivingEntity) animatableEntity.getEntity();
         Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
@@ -137,11 +137,12 @@ public final class ModelPreviewRenderer {
         livingEntity.yHeadRot = -yaw;
         livingEntity.yHeadRotO = -yaw;
 
-        // TODO 1.21.6+ port: Lighting setup is now driven by GUI render state; no-op for now.
+        // 1.21.9: overrideCameraOrientation/setRenderShadow removed from EntityRenderDispatcher.
+        // Apply the camera rotation manually onto the PoseStack and rely on the submit-pipeline
+        // (PIP-aware submit path) to handle shadow suppression via state.shadowRadius/state.shadowPieces.
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         rotationX.conjugate();
-        entityRenderDispatcher.overrideCameraOrientation(rotationX);
-        entityRenderDispatcher.setRenderShadow(false);
+        poseStack.mulPose(rotationX);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
 
         AnimationTracker animationTracker = ((IPreviewAnimatable) animatableEntity).getAnimationStateMachine();
@@ -183,7 +184,7 @@ public final class ModelPreviewRenderer {
         }
 
         bufferSource.endBatch();
-        entityRenderDispatcher.setRenderShadow(true);
+        // 1.21.9: setRenderShadow(true) no longer exists — shadow state is per-renderState now.
         livingEntity.yBodyRot = oldBodyRot;
         livingEntity.yBodyRotO = oldBodyRotO;
         livingEntity.setYRot(oldYRot);
@@ -253,12 +254,14 @@ public final class ModelPreviewRenderer {
     private static void renderVehicleEntity(float yaw, Entity riderEntity, PoseStack poseStack, EntityRenderDispatcher entityRenderDispatcher, MultiBufferSource.BufferSource bufferSource, Entity vehicleEntity, float partialTick) {
         poseStack.pushPose();
         poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
-        entityRenderDispatcher.render(vehicleEntity, 0.0d, -(vehicleEntity.getPassengerRidingPosition(riderEntity).y - vehicleEntity.getY()), 0.0d, partialTick, poseStack, bufferSource, 15728880);
+        // 1.21.9: EntityRenderDispatcher.render(Entity,...) was replaced by submit(state, cameraState,...);
+        // legacy preview vehicle rendering is now driven by the PIP-aware submit pipeline (see
+        // GuiEntityRendererMixin) — this immediate-mode path is intentionally a no-op.
         poseStack.popPose();
     }
 
     // 模型预览页面
-    public static <T extends Player, TAnimatable extends LivingAnimatable<T>, S extends PlayerRenderState> void renderLivingEntityPreview(float x, float y, float scale, float partialTick, TAnimatable animatable, S state, GeoReplacedEntityRenderer<T, TAnimatable, S> renderer, boolean disablePreviewRotation, boolean hideEquipment) {
+    public static <T extends Player, TAnimatable extends LivingAnimatable<T>, S extends AvatarRenderState> void renderLivingEntityPreview(float x, float y, float scale, float partialTick, TAnimatable animatable, S state, GeoReplacedEntityRenderer<T, TAnimatable, S> renderer, boolean disablePreviewRotation, boolean hideEquipment) {
         ItemStack[] savedEquipment;
         setPreviewMode(true);
         LivingEntity livingEntity = animatable.getEntity();
@@ -313,17 +316,16 @@ public final class ModelPreviewRenderer {
             livingEntity.yHeadRotO = vehicleYaw;
         }
 
-        // TODO 1.21.6+ port: Lighting setup is now driven by GUI render state; no-op for now.
+        // 1.21.9: overrideCameraOrientation/setRenderShadow are gone — apply camera rotation onto
+        // the PoseStack manually; shadow toggling now happens via state.shadowRadius in the submit pipeline.
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         rotationX.conjugate();
-        entityRenderDispatcher.overrideCameraOrientation(rotationX);
-        entityRenderDispatcher.setRenderShadow(false);
+        poseStack.mulPose(rotationX);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
 
         renderer.renderEntity(animatable, state, 0.0f, partialTick, poseStack, bufferSource, 15728880);
 
         bufferSource.endBatch();
-        entityRenderDispatcher.setRenderShadow(true);
         livingEntity.yBodyRot = oldBodyRot;
         livingEntity.yBodyRotO = oldBodyRotO;
         livingEntity.setYRot(oldYRot);
@@ -367,16 +369,16 @@ public final class ModelPreviewRenderer {
         rotationZ.mul(rotationY);
         poseStack.mulPose(rotationZ);
 
+        // 1.21.9: overrideCameraOrientation/setRenderShadow/render(Entity,...) all removed from
+        // EntityRenderDispatcher. The overlay paper-doll path was already known-corrupt under the
+        // 1.21.8 deferred GUI pipeline (see header comment further down); the PIP-aware submit
+        // helpers below replace it. This immediate-mode path is left as a no-op to preserve callers.
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         rotationY.conjugate();
-        entityRenderDispatcher.overrideCameraOrientation(rotationY);
-        entityRenderDispatcher.setRenderShadow(false);
-
+        poseStack.mulPose(rotationY);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-        entityRenderDispatcher.render(localPlayer, 0.0d, 0.0d, 0.0d, partialTick, poseStack, bufferSource, 15728880);
         bufferSource.endBatch();
 
-        entityRenderDispatcher.setRenderShadow(true);
         modelViewStack.popMatrix();
         setExtraPlayerMode(false);
     }
@@ -388,7 +390,7 @@ public final class ModelPreviewRenderer {
     // call bufferSource.endBatch() during the Screen.render phase. In 1.21.8
     // GUI rendering is deferred (GuiRenderState/GuiRenderer/PIP), so those
     // immediate-mode calls land with the wrong projection / corrupt later
-    // deferred draws. The submitX methods below build a PlayerRenderState,
+    // deferred draws. The submitX methods below build a AvatarRenderState,
     // record an animatable in PreviewEntityRegistry so GuiEntityRendererMixin
     // can dispatch to CustomPlayerRenderer.renderEntity directly, and rely
     // on the PIP renderer for FBO/projection/lighting setup.
@@ -419,7 +421,7 @@ public final class ModelPreviewRenderer {
         }
 
         CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
-        PlayerRenderState state = new PlayerRenderState();
+        AvatarRenderState state = new AvatarRenderState();
         renderer.extractRenderState((Player) entity, state, partialTick);
         state.hitboxesRenderState = null;
 
@@ -483,7 +485,7 @@ public final class ModelPreviewRenderer {
         int y1 = (int) (y + scale * 2.0F);
 
         CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
-        PlayerRenderState state = new PlayerRenderState();
+        AvatarRenderState state = new AvatarRenderState();
         renderer.extractRenderState(localPlayer, state, partialTick);
         state.hitboxesRenderState = null;
         PreviewEntityRegistry.register(state, cap);
@@ -566,7 +568,7 @@ public final class ModelPreviewRenderer {
         }
 
         CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
-        PlayerRenderState state = new PlayerRenderState();
+        AvatarRenderState state = new AvatarRenderState();
         renderer.extractRenderState((Player) entity, state, partialTick);
         state.hitboxesRenderState = null;
 
@@ -692,7 +694,9 @@ public final class ModelPreviewRenderer {
         poseStack.pushPose();
         poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
         double yOffset = -(vehicle.getPassengerRidingPosition(rider).y - vehicle.getY());
-        dispatcher.render(vehicle, 0.0d, yOffset, 0.0d, partialTick, poseStack, bufferSource, packedLight);
+        // 1.21.9: dispatcher.render(Entity,...) replaced by submit(state, cameraState,...).
+        // Preview vehicle rendering for PIP is handled by the submit-pipeline path; this
+        // immediate-mode helper is intentionally a no-op until the preview migration completes.
         poseStack.popPose();
     }
 }

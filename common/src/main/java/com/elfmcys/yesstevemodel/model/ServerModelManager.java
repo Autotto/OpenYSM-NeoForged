@@ -2,7 +2,7 @@ package com.elfmcys.yesstevemodel.model;
 
 import com.elfmcys.yesstevemodel.capability.ModelInfoCapability;
 import com.elfmcys.yesstevemodel.client.ExportResult;
-import com.elfmcys.yesstevemodel.access.ServerCommonPacketListenerImplAccess;
+import com.elfmcys.yesstevemodel.access.ServerCommonPacketListenerImplAccessor;
 import com.elfmcys.yesstevemodel.model.format.*;
 import com.elfmcys.yesstevemodel.resource.YSMBinaryDeserializer;
 import com.elfmcys.yesstevemodel.resource.YSMBinarySerializer;
@@ -30,7 +30,6 @@ import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.floats.FloatReferencePair;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import net.minecraft.network.Connection;
-import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -892,7 +891,7 @@ public final class ServerModelManager {
                 }
             }
             arrayList.sort((a, b) -> Float.compare(a.firstFloat(), b.firstFloat()));
-            nativeSyncModels(new UUID[]{serverPlayer.getUUID()}, new String[]{serverPlayer.getGameProfile().getName()}, collectPlayerModelIds(arrayList.stream().map(it.unimi.dsi.fastutil.Pair::second).toList()), consumer);
+            nativeSyncModels(new UUID[]{serverPlayer.getUUID()}, new String[]{serverPlayer.getGameProfile().name()}, collectPlayerModelIds(arrayList.stream().map(it.unimi.dsi.fastutil.Pair::second).toList()), consumer);
         });
     }
 
@@ -910,7 +909,7 @@ public final class ServerModelManager {
                 for (ServerPlayer value : players) {
                     validatePlayerModel(value);
                 }
-                nativeSyncModels(players.stream().filter(NetworkHandler::isPlayerConnected).map((player) -> player.getUUID()).toArray(i -> new UUID[i]), players.stream().filter(NetworkHandler::isPlayerConnected).map(serverPlayer -> serverPlayer.getGameProfile().getName()).toArray(i2 -> new String[i2]), collectPlayerModelIds(players), consumer2);
+                nativeSyncModels(players.stream().filter(NetworkHandler::isPlayerConnected).map((player) -> player.getUUID()).toArray(i -> new UUID[i]), players.stream().filter(NetworkHandler::isPlayerConnected).map(serverPlayer -> serverPlayer.getGameProfile().name()).toArray(i2 -> new String[i2]), collectPlayerModelIds(players), consumer2);
             });
         };
         return nativeLoadModels(action);
@@ -964,7 +963,7 @@ public final class ServerModelManager {
         if (!serverGamePacketListenerImpl.isAcceptingMessages() || !serverGamePacketListenerImpl.getClass().equals(ServerGamePacketListenerImpl.class)) {
             return null;
         }
-        return ((ServerCommonPacketListenerImplAccess) serverGamePacketListenerImpl).ysm$getConnection();
+        return ((ServerCommonPacketListenerImplAccessor) serverGamePacketListenerImpl).ysm$getConnection();
     }
 
     private static boolean sendModelData(UUID uuid, ByteBuffer byteBuffer, PendingTransfer pendingTransfer) {

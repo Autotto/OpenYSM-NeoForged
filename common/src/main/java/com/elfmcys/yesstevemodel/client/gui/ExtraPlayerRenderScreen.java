@@ -7,6 +7,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
@@ -100,7 +102,10 @@ public class ExtraPlayerRenderScreen extends Screen {
 
     }
 
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x();
+        double mouseY = event.y();
+        int button = event.button();
         boolean inLeftHandleX = ((double) (this.mouseStartX - this.offsetX)) < mouseX && mouseX < ((double) (this.mouseStartX + this.offsetX));
         boolean inLeftHandleY = ((double) (this.mouseStartY - this.offsetX)) < mouseY && mouseY < ((double) (this.mouseStartY + this.offsetX));
         if (button == 0 && inLeftHandleX && inLeftHandleY) {
@@ -113,16 +118,18 @@ public class ExtraPlayerRenderScreen extends Screen {
         if (button == 0 && inRightHandleX && inRightHandleY) {
             this.isRightDragging = true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(MouseButtonEvent event) {
         this.isDragging = false;
         this.isRightDragging = false;
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseReleased(event);
     }
 
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+        double mouseX = event.x();
+        double mouseY = event.y();
         if (this.isRightDragging) {
             this.rotationX = (float) Math.min(mouseX - this.mouseStartX, (mouseY - this.mouseStartY) / 2.0d);
             return true;
@@ -132,18 +139,19 @@ public class ExtraPlayerRenderScreen extends Screen {
             this.mouseStartY = (int) mouseY;
             return true;
         }
-        if (button == this.offsetY) {
+        if (event.button() == this.offsetY) {
             this.rotationY += (float) (dragX * 2.0d);
             return true;
         }
         return false;
     }
 
-    public boolean charTyped(char codePoint, int modifiers) {
-        if (Character.toLowerCase(codePoint) == RESET_KEY && hasAltDown()) {
+    public boolean charTyped(CharacterEvent event) {
+        int codePoint = event.codepoint();
+        if (Character.toLowerCase(codePoint) == RESET_KEY && Minecraft.getInstance().hasAltDown()) {
             resetTransform();
         }
-        return super.charTyped(codePoint, modifiers);
+        return super.charTyped(event);
     }
 
     private void resetTransform() {
