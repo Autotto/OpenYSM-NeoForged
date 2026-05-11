@@ -22,6 +22,7 @@
 | 1.21.9  | ✅ (见 commit history)                        |
 | 1.21.10 | ✅ (见 commit history)                        |
 | 1.21.11 | ✅                                           |
+| 26.1.x  | ❌ Architectury 没更新                          |
 
 ## 已知问题
-ModelPreviewRenderer 中的某些动画暂未适配, 会出现问题 (sleep, ride 等动画)
+ModelPreviewRenderer 中的动画暂未适配, 会出现问题 (sleep, ride 等动画)
