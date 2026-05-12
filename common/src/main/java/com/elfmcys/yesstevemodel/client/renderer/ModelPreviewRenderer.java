@@ -482,10 +482,22 @@ public final class ModelPreviewRenderer {
         }
         cap.tickModel();
 
-        int x0 = (int) x;
-        int y0 = (int) y;
-        int x1 = (int) (x + scale * 1.2F);
-        int y1 = (int) (y + scale * 2.0F);
+        // Vanilla's PIP path uses this rect as both the off-screen texture size
+        // and the on-screen blit destination. GuiEntityRenderer overrides
+        // getTranslateY to return j/2, so the entity is anchored at the rect's
+        // CENTER (not bottom). The original 1.2*scale x 2.0*scale rect clipped
+        // any model extending past a default Steve silhouette (long weapons,
+        // oversized cosmetics, raised arms). Grow the rect symmetrically around
+        // its original center so visible placement is unchanged but the
+        // texture has room to draw the full model.
+        float cx = (float) (x + scale * 0.6F);
+        float cy = (float) (y + scale * 1.0F);
+        int halfW = (int) (scale * 2.0F);
+        int halfH = (int) (scale * 2.5F);
+        int x0 = (int) cx - halfW;
+        int x1 = (int) cx + halfW;
+        int y0 = (int) cy - halfH;
+        int y1 = (int) cy + halfH;
 
         CustomPlayerRenderer renderer = RendererManager.getPlayerRenderer();
         AvatarRenderState state = new AvatarRenderState();
