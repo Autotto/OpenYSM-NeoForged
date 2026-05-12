@@ -31,6 +31,8 @@ public class ItemTagsConstants {
     public static final TagKey<Item> TRIDENTS = createTag("tridents");
 
     public static final TagKey<Item> SLASHBLADE = createTag("slashblade");
+    public static final TagKey<Item> MACE = createTag("mace");
+    public static final TagKey<Item> PIKE = createTag("pike");
 
     private static TagKey<Item> createTag(String str) {
         return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(YesSteveModel.MOD_ID, str));

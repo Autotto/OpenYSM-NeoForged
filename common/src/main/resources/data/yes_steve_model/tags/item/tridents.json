@@ -1,7 +1,7 @@
 {
   "values": [
     {
-      "id": "#forge:tools/tridents",
+      "id": "#c:tools/tridents",
       "required": false
     },
     {

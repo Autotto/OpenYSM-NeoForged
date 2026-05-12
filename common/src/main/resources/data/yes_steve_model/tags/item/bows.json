@@ -1,7 +1,7 @@
 {
   "values": [
     {
-      "id": "#forge:tools/bows",
+      "id": "#c:tools/bows",
       "required": false
     }
   ]

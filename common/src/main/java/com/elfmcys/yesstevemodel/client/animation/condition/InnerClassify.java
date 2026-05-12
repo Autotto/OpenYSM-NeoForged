@@ -28,6 +28,9 @@ public class InnerClassify {
         if (itemStack.is(ItemTagsConstants.SWORDS)) {
             return "sword";
         }
+        if (item instanceof MaceItem || itemStack.is(ItemTagsConstants.MACE)) {
+            return "mace";
+        }
         if (TouhouLittleMaidCompat.isMaidItem(item)) {
             return "gohei";
         }
@@ -58,8 +61,8 @@ public class InnerClassify {
         if ((item instanceof TridentItem) || itemStack.is(ItemTagsConstants.TRIDENTS)) {
             return "spear";
         }
-        if (itemStack.is(ItemTags.SPEARS)) {
-            return "spear";
+        if (itemStack.is(ItemTagsConstants.PIKE)) {
+            return "lance";
         }
         if ((item instanceof ThrowablePotionItem) || itemStack.is(ItemTagsConstants.THROWABLE_POTION)) {
             return "throwable_potion";

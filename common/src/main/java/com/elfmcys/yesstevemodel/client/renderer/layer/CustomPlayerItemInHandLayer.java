@@ -88,14 +88,6 @@ public class CustomPlayerItemInHandLayer extends GeoLayerRenderer<CustomPlayerEn
                     poseStack.translate(0.1d, 0.0d, 0.0d);
                     poseStack.scale(1.25f, 1.25f, 1.25f);
                 }
-                if (
-                        itemStack.is(ItemTags.SPEARS) &&
-                        livingEntity.isUsingItem() &&
-                        livingEntity.getUseItemRemainingTicks() > 0 &&
-                        (livingEntity.getUsedItemHand() == InteractionHand.MAIN_HAND && humanoidArm == HumanoidArm.RIGHT) || (livingEntity.getUsedItemHand() == InteractionHand.OFF_HAND && humanoidArm == HumanoidArm.LEFT)
-                ) {
-                    poseStack.scale(-1, -1, 1);
-                }
                 this.itemRenderer.renderItem(livingEntity, itemStack, itemDisplayContext, poseStack, collector, i);
             }
             poseStack.popPose();
