@@ -1,5 +1,6 @@
 package com.elfmcys.yesstevemodel.client.animation.condition;
 
+import net.minecraft.tags.ItemTags;
 import rip.ysm.compat.touhoulittlemaid.TouhouLittleMaidCompat;
 import rip.ysm.compat.slashblade.SlashBladeCompat;
 import com.elfmcys.yesstevemodel.util.ItemTagsConstants;
@@ -55,6 +56,9 @@ public class InnerClassify {
             return "fishing_rod";
         }
         if ((item instanceof TridentItem) || itemStack.is(ItemTagsConstants.TRIDENTS)) {
+            return "spear";
+        }
+        if (itemStack.is(ItemTags.SPEARS)) {
             return "spear";
         }
         if ((item instanceof ThrowablePotionItem) || itemStack.is(ItemTagsConstants.THROWABLE_POTION)) {

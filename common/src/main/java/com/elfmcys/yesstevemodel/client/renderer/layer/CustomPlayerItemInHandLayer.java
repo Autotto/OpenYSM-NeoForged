@@ -1,6 +1,8 @@
 package com.elfmcys.yesstevemodel.client.renderer.layer;
 
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.InteractionHand;
 import rip.ysm.compat.slashblade.SlashBladeRenderer;
 import rip.ysm.compat.slashblade.SlashBladeCompat;
 import rip.ysm.compat.gun.swarfare.SWarfareCompat;
@@ -85,6 +87,9 @@ public class CustomPlayerItemInHandLayer extends GeoLayerRenderer<CustomPlayerEn
                 if (SWarfareCompat.isGunItem(itemStack)) {
                     poseStack.translate(0.1d, 0.0d, 0.0d);
                     poseStack.scale(1.25f, 1.25f, 1.25f);
+                }
+                if (itemStack.is(ItemTags.SPEARS) && livingEntity.isUsingItem() && livingEntity.getUseItemRemainingTicks() > 0 && (livingEntity.getUsedItemHand() == InteractionHand.MAIN_HAND && humanoidArm == HumanoidArm.RIGHT)) {
+                    poseStack.scale(-1, -1, 1);
                 }
                 this.itemRenderer.renderItem(livingEntity, itemStack, itemDisplayContext, poseStack, collector, i);
             }
