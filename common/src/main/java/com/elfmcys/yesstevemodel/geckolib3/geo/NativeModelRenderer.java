@@ -14,6 +14,11 @@ import org.joml.*;
 import rip.ysm.compat.oculus.OculusCompat;
 import rip.ysm.compat.optifine.OptiFineDetector;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
 public class NativeModelRenderer {
     private static final Matrix4f projectionModelViewMatrix = new Matrix4f();
 
@@ -196,9 +201,9 @@ public class NativeModelRenderer {
         localMat.rotateY(animRy);
         localMat.rotateX(animRx);
 
-        if (bone.name.equals("gun")) {
-            //"".hashCode();
-        }
+//        if (bone.name.equals("gun")) {
+//            //"".hashCode();
+//        }
 
         if (animSx != 1.0f || animSy != 1.0f || animSz != 1.0f) {
             localMat.scale(animSx, animSy, animSz);

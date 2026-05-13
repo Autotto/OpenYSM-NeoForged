@@ -1,5 +1,6 @@
 package com.elfmcys.yesstevemodel.client.gui;
 
+import com.elfmcys.yesstevemodel.NativeLibLoader;
 import com.elfmcys.yesstevemodel.client.ClientModelManager;
 import com.elfmcys.yesstevemodel.YesSteveModel;
 import com.elfmcys.yesstevemodel.client.entity.PlayerPreviewEntity;
@@ -451,11 +452,8 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         guiGraphics.fillGradient(this.guiLeft, this.guiTop, this.guiLeft + 135, this.guiTop + 235, -14540254, -14540254);
         guiGraphics.fillGradient(this.guiLeft + 138, this.guiTop, this.guiLeft + 420, this.guiTop + 235, -14540254, -14540254);
         guiGraphics.fillGradient(this.guiLeft + 351, this.guiTop + 7, this.guiLeft + 352, this.guiTop + 21, -790560, -790560);
-        guiGraphics.guiRenderState.nextStratum();
-        renderModelPreview(guiGraphics, mouseX, mouseY, this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false));
-        guiGraphics.guiRenderState.nextStratum();
         this.searchBox.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.guiRenderState.nextStratum();
+        renderModelPreview(guiGraphics, mouseX, mouseY, this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false));
         if (this.searchBox.getValue().isEmpty() && !this.searchBox.isFocused()) {
             guiGraphics.drawString(this.font, Component.translatable("gui.yes_steve_model.search").withStyle(ChatFormatting.ITALIC), this.guiLeft + 148, this.guiTop + 10, 0xFF777777);
         }
@@ -465,8 +463,12 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         int pageY = this.guiTop + 223;
         Objects.requireNonNull(this.font);
         guiGraphics.drawString(font, str, iWidth, pageY - (9 / 2), 0xFFF3F0E0);
+        String renderer = (NativeLibLoader.isLoaded() && !GeneralConfig.USE_COMPATIBILITY_RENDERER.get()) ? "SIMD" : "Fallback";
         String strVersionString = Platform.getMod(YesSteveModel.MOD_ID).getVersion();
-        guiGraphics.drawString(this.font, strVersionString, this.guiLeft + 2, this.guiTop + 226, ChatFormatting.DARK_GRAY.getColor().intValue() | 0xFF000000);
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(0.0f, 0.0f, 1000.0f);
+        guiGraphics.drawString(this.font, strVersionString + " (" + renderer + ")", this.guiLeft + 2, this.guiTop + 226, ChatFormatting.DARK_GRAY.getColor().intValue() | 0xFF000000);
+        guiGraphics.pose().popMatrix();
         if (StringUtils.isNotBlank(currentPath)) {
             int lineIndex = 0;
             List listSplit = this.font.split(Component.literal("📂 " + currentPath).withStyle(ChatFormatting.GRAY), 270);
@@ -537,9 +539,9 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
     public void renderModelPreview(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         LocalPlayer localPlayer = Minecraft.getInstance().player;
         if (localPlayer != null) {
-            guiGraphics.guiRenderState.nextStratum();
+//            guiGraphics.guiRenderState.nextStratum();
             InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, this.guiLeft + 5, this.guiTop + 29, this.guiLeft + 130, this.guiTop + 200, 70, 0.0625F, mouseX, mouseY, localPlayer);
-            guiGraphics.guiRenderState.nextStratum();
+//            guiGraphics.guiRenderState.nextStratum();
 
 //            guiGraphics.disableScissor();
             PlayerCapability.get(localPlayer).ifPresent(cap -> {
