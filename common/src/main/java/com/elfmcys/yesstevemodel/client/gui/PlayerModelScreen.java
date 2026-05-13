@@ -466,7 +466,7 @@ public class PlayerModelScreen extends Screen implements IGuiWidget {
         String renderer = (NativeLibLoader.isLoaded() && !GeneralConfig.USE_COMPATIBILITY_RENDERER.get()) ? "SIMD" : "Fallback";
         String strVersionString = Platform.getMod(YesSteveModel.MOD_ID).getVersion();
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(0.0f, 0.0f, 1000.0f);
+        guiGraphics.pose().translate(0.0f, 0.0f);
         guiGraphics.drawString(this.font, strVersionString + " (" + renderer + ")", this.guiLeft + 2, this.guiTop + 226, ChatFormatting.DARK_GRAY.getColor().intValue() | 0xFF000000);
         guiGraphics.pose().popMatrix();
         if (StringUtils.isNotBlank(currentPath)) {
