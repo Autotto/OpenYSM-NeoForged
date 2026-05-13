@@ -20,7 +20,8 @@
     "client.PauseScreenMixin",
     "client.ScreenAccessor",
     "client.ThrowableItemProjectileAccessor",
-    "client.WorldRendererMixin"
+    "client.WorldRendererMixin",
+    "client.RenderSystemAccessor"
   ],
   "mixins": [
     "AbstractArrowEntityMixin",
