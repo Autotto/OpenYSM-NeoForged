@@ -99,7 +99,7 @@ public abstract class EntityRenderDispatcherMixin implements IEntityRenderDispat
                     } else {
                         callOriginal = CustomProjectileRenderer.renderProjectile(projectile, state, partialTick, poseStack, bufferSource, packedLight);
                     }
-                    bufferSource.endBatch();
+                    // bufferSource.endBatch();
                     return callOriginal;
                 }
                 return true;
@@ -109,7 +109,7 @@ public abstract class EntityRenderDispatcherMixin implements IEntityRenderDispat
                 vehicleRenderer.extractRenderState(entity, state, partialTick);
                 ModelPreviewRenderer.renderVehicleModel(entity, poseStack, partialTick);
                 boolean callOriginal = CustomVehicleRenderer.renderVehicle(entity, state, entity.getRotationVector().x, partialTick, poseStack, bufferSource, packedLight);
-                bufferSource.endBatch();
+                // bufferSource.endBatch();
                 return callOriginal;
             }
             return true;

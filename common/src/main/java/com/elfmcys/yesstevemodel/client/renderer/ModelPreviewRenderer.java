@@ -177,13 +177,13 @@ public final class ModelPreviewRenderer {
             if (renderGround) {
                 renderGroundPreview(scale, pitch, yaw, bufferSource);
             }
-            bufferSource.endBatch();
+            // bufferSource.endBatch();
             renderer.renderEntity((LivingAnimatable) animatableEntity, state, 0.0f, partialTick, poseStack, bufferSource, 15728880);
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
 
-        bufferSource.endBatch();
+        // bufferSource.endBatch();
         // 1.21.9: setRenderShadow(true) no longer exists — shadow state is per-renderState now.
         livingEntity.yBodyRot = oldBodyRot;
         livingEntity.yBodyRotO = oldBodyRotO;
@@ -325,7 +325,7 @@ public final class ModelPreviewRenderer {
 
         renderer.renderEntity(animatable, state, 0.0f, partialTick, poseStack, bufferSource, 15728880);
 
-        bufferSource.endBatch();
+        // bufferSource.endBatch();
         livingEntity.yBodyRot = oldBodyRot;
         livingEntity.yBodyRotO = oldBodyRotO;
         livingEntity.setYRot(oldYRot);
@@ -377,7 +377,7 @@ public final class ModelPreviewRenderer {
         rotationY.conjugate();
         poseStack.mulPose(rotationY);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-        bufferSource.endBatch();
+        // bufferSource.endBatch();
 
         modelViewStack.popMatrix();
         setExtraPlayerMode(false);

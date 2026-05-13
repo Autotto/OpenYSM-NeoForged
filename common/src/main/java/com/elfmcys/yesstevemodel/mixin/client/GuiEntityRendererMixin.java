@@ -90,7 +90,7 @@ public class GuiEntityRendererMixin {
                     if (entry.afterEntity() != null) {
                         entry.afterEntity().render(poseStack, bufferSource, state.lightCoords);
                     }
-                    bufferSource.endBatch();
+                    // bufferSource.endBatch();
                 } finally {
                     RenderContext.exit();
                 }

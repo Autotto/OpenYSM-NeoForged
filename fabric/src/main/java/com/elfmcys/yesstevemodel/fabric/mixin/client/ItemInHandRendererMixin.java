@@ -52,7 +52,7 @@ public abstract class ItemInHandRendererMixin {
         try {
             boolean cancelled = ReplacePlayerHandRenderEvent.onRenderArm(minecraft.player, humanoidArm, poseStack, bufferSource, packedLight);
             if (cancelled) {
-                bufferSource.endBatch();
+                // bufferSource.endBatch();
             }
             return cancelled;
         } finally {

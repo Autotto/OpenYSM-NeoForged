@@ -62,7 +62,7 @@ public class ReplacePlayerRenderEvent {
                                 ? net.minecraft.client.renderer.LightTexture.FULL_BRIGHT
                                 : renderState.lightCoords;
                         RendererManager.getPlayerRenderer().render(entity, renderState, entity.getYRot(), ModelPreviewRenderer.isPreview() ? 1.0f : partialTick, poseStack, bufferSource, packedLight);
-                        bufferSource.endBatch();
+                        // bufferSource.endBatch();
                     } finally {
                         RenderContext.exit();
                     }
