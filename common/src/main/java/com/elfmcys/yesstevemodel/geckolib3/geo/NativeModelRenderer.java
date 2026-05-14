@@ -6,10 +6,12 @@ import com.elfmcys.yesstevemodel.NativeLibLoader;
 import com.elfmcys.yesstevemodel.client.renderer.ModelPreviewRenderer;
 import com.elfmcys.yesstevemodel.config.GeneralConfig;
 import com.elfmcys.yesstevemodel.geckolib3.geo.render.built.*;
+import com.elfmcys.yesstevemodel.util.log.ChatLogger;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.resources.Identifier;
 import org.joml.*;
 import rip.ysm.compat.oculus.OculusCompat;
 import rip.ysm.compat.optifine.OptiFineDetector;
@@ -28,10 +30,10 @@ public class NativeModelRenderer {
         renderMesh(buffer, pose, model, boneParams, stateBuffer, textureIndex, renderPartMask, packedLight, packedOverlay, red, green, blue, alpha, null);
     }
 
-    public static void renderMesh(VertexConsumer buffer, PoseStack.Pose pose, GeoModel model, float[] boneParams, float[] stateBuffer, int textureIndex, int renderPartMask, int packedLight, int packedOverlay, float red, float green, float blue, float alpha, net.minecraft.resources.ResourceLocation textureLocation) {
+    public static void renderMesh(VertexConsumer buffer, PoseStack.Pose pose, GeoModel model, float[] boneParams, float[] stateBuffer, int textureIndex, int renderPartMask, int packedLight, int packedOverlay, float red, float green, float blue, float alpha, Identifier textureLocation) {
         OculusCompat.updatePBRState();
         boolean isCompatMode = OptiFineDetector.isOptifinePresent() || GeneralConfig.USE_COMPATIBILITY_RENDERER.get();
-        net.minecraft.client.Minecraft.getInstance().gameRenderer.getProjectionMatrix(net.minecraft.client.Minecraft.getInstance().options.fov().get()).mul(RenderSystem.getModelViewMatrix(), projectionModelViewMatrix);
+        projectionModelViewMatrix.set(net.minecraft.client.Minecraft.getInstance().gameRenderer.getProjectionMatrix(net.minecraft.client.Minecraft.getInstance().options.fov().get())).mul(RenderSystem.getModelViewMatrix());
         boolean isPreview = ModelPreviewRenderer.isPreview() || ModelPreviewRenderer.isExtraPlayer();
 
         if (textureLocation != null && NativeLibLoader.isLoaded() && !GeneralConfig.USE_COMPATIBILITY_RENDERER.get() && GeneralConfig.USE_GPU_RENDERER.get()) {
@@ -48,7 +50,7 @@ public class NativeModelRenderer {
             }
         }
 
-        if (NativeLibLoader.isLoaded() && !GeneralConfig.USE_COMPATIBILITY_RENDERER.get()) { // WIP: SIMD MODEL RENDER
+        if (NativeLibLoader.isLoaded() && !GeneralConfig.USE_COMPATIBILITY_RENDERER.get() && !isPreview) { // WIP: SIMD MODEL RENDER
             nativeRenderModel(
                     buffer,
                     pose,
@@ -238,19 +240,21 @@ public class NativeModelRenderer {
 
     private static final float[] matrixTransferArray = new float[48];
     @SuppressWarnings("unused") // TODO: native中直接往VertexConsumer中的buffer写入顶点
-    public static void submitVertices(Object v, int vertexCount, float[] fArr, int[] iArr) {
-        int floatIndex = 0;
-        int intIndex = 0;
+    public static void submitVertices(Object v, int vertexCount, ByteBuffer fBuf, ByteBuffer iBuf) {
+        FloatBuffer f = fBuf.order(ByteOrder.nativeOrder()).asFloatBuffer();
+        IntBuffer in = iBuf.order(ByteOrder.nativeOrder()).asIntBuffer();
+        int fIdx = 0, iIdx = 0;
 
         for (int i = 0; i < vertexCount; i++) {
-            ((VertexConsumer) v).addVertex(fArr[floatIndex + 0], fArr[floatIndex + 1], fArr[floatIndex + 2])
-                    .setColor(fArr[floatIndex + 3], fArr[floatIndex + 4], fArr[floatIndex + 5], fArr[floatIndex + 6])
-                    .setUv(fArr[floatIndex + 7], fArr[floatIndex + 8])
-                    .setOverlay(iArr[intIndex + 0])
-                    .setLight(iArr[intIndex + 1])
-                    .setNormal(fArr[floatIndex + 9], fArr[floatIndex + 10], fArr[floatIndex + 11]);
-            floatIndex += 12;
-            intIndex += 2;
+            ((VertexConsumer) v)
+                    .addVertex(f.get(fIdx),     f.get(fIdx + 1), f.get(fIdx + 2))
+                    .setColor(f.get(fIdx + 3), f.get(fIdx + 4), f.get(fIdx + 5), f.get(fIdx + 6))
+                    .setUv(f.get(fIdx + 7), f.get(fIdx + 8))
+                    .setOverlay(in.get(iIdx))
+                    .setLight(in.get(iIdx + 1))
+                    .setNormal(f.get(fIdx + 9), f.get(fIdx + 10), f.get(fIdx + 11));
+            fIdx += 12;
+            iIdx += 2;
         }
     }
 
@@ -263,11 +267,9 @@ public class NativeModelRenderer {
 
         if (mesh.nativeModelHandle == 0) return;
 
-        Matrix4f projMat = net.minecraft.client.Minecraft.getInstance().gameRenderer.getProjectionMatrix(net.minecraft.client.Minecraft.getInstance().options.fov().get());
-
         pose.pose().get(matrixTransferArray, 0);
         pose.normal().get(matrixTransferArray, 16);
-        projMat.get(matrixTransferArray, 32);
+        projectionModelViewMatrix.get(matrixTransferArray, 32);
 
         GeoModel.nComputeModelVertices(
                 mesh.nativeModelHandle,

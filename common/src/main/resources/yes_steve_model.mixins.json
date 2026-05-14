@@ -21,7 +21,7 @@
     "client.ScreenAccessor",
     "client.ThrowableItemProjectileAccessor",
     "client.WorldRendererMixin",
-    "client.RenderSystemAccessor"
+    "client.GlBufferAccessor"
   ],
   "mixins": [
     "AbstractArrowEntityMixin",

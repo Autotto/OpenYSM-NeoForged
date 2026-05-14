@@ -14,22 +14,22 @@ import java.util.stream.Collectors;
 
 public final class BoneSkinShader {
     public static final int ssbo = 0;
+    public static final int lightUboBinding = 1;
+    public static final int projUboBinding = 2;
     private static int program = 0;
-    private static int locProj = -1;
+    private static int locModelView = -1;
     private static int locColor = -1;
     private static int locOverlay = -1;
     private static int locFogStart = -1;
     private static int locFogEnd = -1;
     private static int locFogColor = -1;
     private static int locFogShape = -1;
-    private static int locLight0 = -1;
-    private static int locLight1 = -1;
     private static boolean failed = false;
 
     public static synchronized boolean ensureCompiled() {
         if (program != 0) return true;
         if (failed) return false;
-        RenderSystem.assertOnRenderThreadOrInit();
+        RenderSystem.assertOnRenderThread();
 
         try {
             int vs = compileShader(GL20.GL_VERTEX_SHADER, getShader("/bone_skin.vsh"), "bone_skin.vsh");
@@ -67,15 +67,23 @@ public final class BoneSkinShader {
                 }
             }
 
-            locProj = GL20.glGetUniformLocation(prog, "u_proj");
+            locModelView = GL20.glGetUniformLocation(prog, "u_modelView");
             locColor = GL20.glGetUniformLocation(prog, "u_color");
             locOverlay = GL20.glGetUniformLocation(prog, "u_packedOverlay");
             locFogStart = GL20.glGetUniformLocation(prog, "u_fogStart");
             locFogEnd = GL20.glGetUniformLocation(prog, "u_fogEnd");
             locFogColor = GL20.glGetUniformLocation(prog, "u_fogColor");
             locFogShape = GL20.glGetUniformLocation(prog, "u_fogShape");
-            locLight0 = GL20.glGetUniformLocation(prog, "u_light0");
-            locLight1 = GL20.glGetUniformLocation(prog, "u_light1");
+
+            int lightBlockIdx = GL31.glGetUniformBlockIndex(prog, "LightingBlock");
+            if (lightBlockIdx != GL31.GL_INVALID_INDEX) {
+                GL31.glUniformBlockBinding(prog, lightBlockIdx, lightUboBinding);
+            }
+
+            int projBlockIdx = GL31.glGetUniformBlockIndex(prog, "ProjectionBlock");
+            if (projBlockIdx != GL31.GL_INVALID_INDEX) {
+                GL31.glUniformBlockBinding(prog, projBlockIdx, projUboBinding);
+            }
 
             int locSampler0 = GL20.glGetUniformLocation(prog, "Sampler0");
             int locSampler1 = GL20.glGetUniformLocation(prog, "Sampler1");
@@ -98,8 +106,8 @@ public final class BoneSkinShader {
         return program;
     }
 
-    public static int locProj() {
-        return locProj;
+    public static int locModelView() {
+        return locModelView;
     }
 
     public static int locColor() {
@@ -124,14 +132,6 @@ public final class BoneSkinShader {
 
     public static int locFogShape() {
         return locFogShape;
-    }
-
-    public static int locLight0() {
-        return locLight0;
-    }
-
-    public static int locLight1() {
-        return locLight1;
     }
 
     private static int compileShader(int type, String src, String name) {
